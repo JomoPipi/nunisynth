@@ -3,6 +3,18 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 const D = x => document.getElementById(x)
 const log = console.log
 
@@ -25,13 +37,17 @@ const masterGain = audioCtx.createGain()
 
 
 
-
+// spec says 24000, but I can only hear up to 17k.
+const OSCILLATOR_MAX_FREQUENCY = 17000
 
 const TAU = 2 * Math.PI
-const PHI = 1.61803398875
-const rangeSliderMax = 20.6
+const PHI = (Math.sqrt(5) + 1) / 2.0
 const logPHI = Math.log(PHI)
+const sliderConstant = Math.log(OSCILLATOR_MAX_FREQUENCY) / logPHI
+const twoThirdsPi = TAU / 3.0
+const colorFactor = TAU / (sliderConstant * 2)
 
+D('node-slider').max = sliderConstant
 
 function toSliderValue(nodeValue) {
     return Math.round(10000 * Math.log(nodeValue + 1) / logPHI ) / 10000
@@ -47,7 +63,7 @@ function toNodeValue(sliderValue) {
 
 
 
-// add title -- sound wont start without initial user gesture.
+// add title screen -- sound wont start without initial user gesture.
 function startScreenSetup({func: f, text: t}) {
     const startScreen = document.createElement('div')
     const S = startScreen.style

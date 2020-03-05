@@ -13,9 +13,6 @@ const scaleSteps = [...Array(12)].reduce(a =>
     [2,2,1,2,2,2,1].reduce((b,v) => b.concat(v+b[b.length-1]), a)
 , [0])
 
-const twoThirdsPi = TAU / 3.0
-const colorFactor = TAU / (20.6*2)
-
 
 
 class Keyboard {

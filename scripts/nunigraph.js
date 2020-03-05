@@ -136,8 +136,6 @@ class NuniGraph {
 
 
     paint() {
-        const twoThirdsPi = TAU / 3.0
-        const colorFactor = TAU / (20.6*2)
         this.ctx.clearRect(0,0,W,H)
         const children = [this.root]
         let isComplete = true
@@ -152,8 +150,10 @@ class NuniGraph {
                 const nodeColor = 'rgb(' + [0,1,2].map(n => 100 * (1 + Math.sin(cval + n * twoThirdsPi)) |0).join`,` + ')'
                 
                 this.ctx.fillStyle = c === this.selectedNode ? 'green' : nodeColor
+                
+                const [R,G,B] = [0, (c.yAxisFactor * 255 / 9.0 | 0), (+ctkb||0) * 255]
 
-                this.ctx.strokeStyle =  ctkb ? 'violet' : 'rgba(0,0,0,0)'
+                this.ctx.strokeStyle = `rgb(${R},${G},${B})`
 
                 const {x,y} = c.display
 

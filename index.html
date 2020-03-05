@@ -1,4 +1,8 @@
 <html lang="en">
+
+
+
+
 <head>
 
     <meta charset="UTF-8">
@@ -11,52 +15,52 @@
     <title>Mobile Synth</title>
 
 </head>
+
+
+
+
 <body>
+
+
 
 
     <!-- <span id="debug" style="position: absolute; top:0; left: 0; z-index:999;" > debug</span> -->
 
-    <div id="graph-page" class='page'>
-        <input type="range" id="vol-slider" min=0 max=0.5 step=0.0001 value=0.5
-            oninput=" masterGain.gain.setValueAtTime(G.savedGain = +this.value, 0)
-        ">
 
+
+
+    <!-- GRAPH PAGE -->
+    <div id="graph-page" class='page'>
+
+
+        <!-- MASTER VOLUME -->
+        <input type="range" id="vol-slider" min=0 max=0.5 step=0.0001 value=0.5
+            oninput=" masterGain.gain.setValueAtTime(G.savedGain = +this.value, 0) ">
+
+
+        <!-- THE GRAPH ITSELF  -->
         <canvas id="nuni-graph"></canvas>
         
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        <!-- NODE EDIT PAGE  -->
         <div id="node-edit-page">
 
+            <!-- NODE VALUE SELECT  -->
             node value (0.0 - 20000):
             <input id="node-value" type="number"
             oninput="
                 D('node-slider').value = toSliderValue(+this.value)
                 G.selectedNode.setValue(+this.value)
             ">
-
-            <input type="range" id="node-slider" min="0" max="20.6" value="12"
-            step="0.00000001"
+            <input type="range" id="node-slider" min="0" value="12" max=20
+            step="1e-9"
             oninput="
                 const v = D('node-value').value = toNodeValue(+this.value)
                 G.selectedNode.setValue(v)
             ">
 
 
-
-
+            <!-- NEXT CHILD TYPE  -->
             <label for="childtype">NEXT CHILD TYPE:</label>
             <select id="child-type-select" name="childtype">
                 <option value="oscillator">oscillator</option>
@@ -83,8 +87,7 @@
             <br>
 
 
-
-            <!-- keyboard controls page needed -->
+            <!-- Y-AXIS INFLUENCE VALUE -->
             <label for="y-axis-factor">Y-AXIS INFLUENCE FACTOR: </label>
             <label id="y-axis-factor-text" for="y-axis-factor"> 0 </label>
             <input type="range" id='y-axis-factor' name='y-axis-factor' 
@@ -95,8 +98,8 @@
             ">
 
 
+            <!-- OSCILLATOR ONLY  -->
             <div id="osc-only-box">
-
                 <label for="osctype">OSC TYPE:</label>
                 <select id="osc-type" name="osctype"
                 oninput="
@@ -115,27 +118,17 @@
                         G.paint()
                     }
                 "> CONNECT NODE TO KEYBOARD </button>
-
             </div>
-            <br>
-            <br>
 
+            <br>
+            <br>
 
         </div>
+        <!-- END NODE EDIT PAGE -->
 
 
-
-
-
-
-
-
-
-
-
-        
     </div>
-    
+    <!-- END GRAPH PAGE  -->
 
 
 
@@ -151,23 +144,34 @@
 
 
 
+
+    <!-- THE KEYBOARD  -->
     <div id="keyboard-page" class='page'>
-        <span id="debug"></span>
         <canvas id="fretboard"></canvas>
     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
-
-
-
-
-
-
-
+    <!-- KEYBOARD SETTINGS PAGE  -->
     <div id="settings-page" class='page'>
         <br> 
         <br> 
         <br>
 
+        <!-- CHOOSE KEYBOARD MODE  -->
         <label for="keyboardmode"> Keyboard Mode: </label>
         <select id="keyboard-mode" name="keyboardmode"
             oninput="
@@ -175,13 +179,14 @@
                 D('notes-per-octave-box').style.display = this.value === 'chromatic' ? 'inline' : 'none'
                 K.update()
             ">
-            <option value="scale">scale</option>
-            <option value="continuous">continuous</option>
-            <option value="chromatic">chromatic</option>
+            <option value="scale">      scale       </option>
+            <option value="continuous"> continuous  </option>
+            <option value="chromatic">  chromatic   </option>
         </select>
 
         <br> 
         
+        <!-- CHOOSE NOTES PER OCTAVE (IF MODE == CONTINUOUS) -->
         <span id="notes-per-octave-box" style='display:none'>
             <label for="npo" class="text0">notes per octave:</label>
             <span id="notes-per-octave-text" class="text0"> 12 </span> <br>
@@ -197,6 +202,7 @@
         
         <br> <br>
 
+        <!-- CHOOSE NUMBER OF OCTAVES -->
         <label for="pitchrange" class="text0">pitch range:</label>
         <span id="pitch-range-text" class="text0"> 2 octaves </span> <br>
         <input type="range" name="pitchrange" id="pitch-range" class="slider"
@@ -220,7 +226,6 @@
             K.attack = v
         "> -->
     </div>
-    
 
 
 
@@ -228,6 +233,16 @@
 
 
 
+
+
+
+
+
+
+
+
+
+    <!-- NAVIGATE THROUGH PAGES  -->
     <select id="page-select" name="pageselect"
     oninput=" showPage(D(this.value + '-page')) ">
         <option value="graph">          Graph           </option>
@@ -236,10 +251,10 @@
     </select>
 
 </body>
-<script src="setup.js"></script>
-<script src="nunigraph.js"></script>
-<script src="keyboard.js"></script>
-<script src="pagehelper.js"></script>
-<script src="index.js"></script>
-<script src="handlers.js"></script>
-<script src='resize.js'></script>
+<script src="scripts/setup.js"></script>
+<script src="scripts/nunigraph.js"></script>
+<script src="scripts/keyboard.js"></script>
+<script src="scripts/pagehelper.js"></script>
+<script src="scripts/index.js"></script>
+<script src="scripts/handlers.js"></script>
+<script src='scripts/resize.js'></script>
