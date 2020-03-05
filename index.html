@@ -1,0 +1,245 @@
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.5,
+    maximum-scale=0.5, maximum-scale=0.5, user-scalable=0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="styles.scss">
+
+    <title>Mobile Synth</title>
+
+</head>
+<body>
+
+
+    <!-- <span id="debug" style="position: absolute; top:0; left: 0; z-index:999;" > debug</span> -->
+
+    <div id="graph-page" class='page'>
+        <input type="range" id="vol-slider" min=0 max=0.5 step=0.0001 value=0.5
+            oninput=" masterGain.gain.setValueAtTime(G.savedGain = +this.value, 0)
+        ">
+
+        <canvas id="nuni-graph"></canvas>
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <div id="node-edit-page">
+
+            node value (0.0 - 20000):
+            <input id="node-value" type="number"
+            oninput="
+                D('node-slider').value = toSliderValue(+this.value)
+                G.selectedNode.setValue(+this.value)
+            ">
+
+            <input type="range" id="node-slider" min="0" max="20.6" value="12"
+            step="0.00000001"
+            oninput="
+                const v = D('node-value').value = toNodeValue(+this.value)
+                G.selectedNode.setValue(v)
+            ">
+
+
+
+
+            <label for="childtype">NEXT CHILD TYPE:</label>
+            <select id="child-type-select" name="childtype">
+                <option value="oscillator">oscillator</option>
+                <option value="gain">      gain      </option>
+            </select>
+            <br>
+
+
+            <button onclick="handleAddChild()"> 
+                add input child 
+            </button> 
+            <br>
+
+
+            <button onclick="handleAddControlChild()"> 
+                add control child 
+            </button>
+            <br>
+
+
+            <button onclick="handleDeleteNode()" style="float:right"> 
+                delete this node 
+            </button> 
+            <br>
+
+
+
+            <!-- keyboard controls page needed -->
+            <label for="y-axis-factor">Y-AXIS INFLUENCE FACTOR: </label>
+            <label id="y-axis-factor-text" for="y-axis-factor"> 0 </label>
+            <input type="range" id='y-axis-factor' name='y-axis-factor' 
+            min='0' max='9' value='0' step='0.0001' oninput="
+                G.selectedNode.yAxisFactor = +this.value
+                D('y-axis-factor-text').innerHTML = this.value
+                // G.paint()
+            ">
+
+
+            <div id="osc-only-box">
+
+                <label for="osctype">OSC TYPE:</label>
+                <select id="osc-type" name="osctype"
+                oninput="
+                    G.selectedNode.node.type = this.value
+                ">
+                    <option value="sine">    sine    </option>
+                    <option value="square">  square  </option>
+                    <option value="triangle">triangle</option>
+                    <option value="sawtooth">sawtooth</option>
+                </select>
+
+                <button id="connect-osc-to-kb-btn" onclick="
+                    if (G.selectedNode.type === 'oscillator') {
+                        G.selectedNode.connectedToKeyboard ^= 1
+                        this.classList.toggle('selected')
+                        G.paint()
+                    }
+                "> CONNECT NODE TO KEYBOARD </button>
+
+            </div>
+            <br>
+            <br>
+
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+        
+    </div>
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="keyboard-page" class='page'>
+        <span id="debug"></span>
+        <canvas id="fretboard"></canvas>
+    </div>
+    
+
+
+
+
+
+
+
+    <div id="settings-page" class='page'>
+        <br> 
+        <br> 
+        <br>
+
+        <label for="keyboardmode"> Keyboard Mode: </label>
+        <select id="keyboard-mode" name="keyboardmode"
+            oninput="
+                K.kbMode = this.value
+                D('notes-per-octave-box').style.display = this.value === 'chromatic' ? 'inline' : 'none'
+                K.update()
+            ">
+            <option value="scale">scale</option>
+            <option value="continuous">continuous</option>
+            <option value="chromatic">chromatic</option>
+        </select>
+
+        <br> 
+        
+        <span id="notes-per-octave-box" style='display:none'>
+            <label for="npo" class="text0">notes per octave:</label>
+            <span id="notes-per-octave-text" class="text0"> 12 </span> <br>
+            <input type="range" id="notes-per-octave" class="slider"
+            min=1 max=24 step=1 value=12 name='npo'
+            oninput="
+                K.notesPerOctave = +this.value
+                K.NRT2 = 2 ** (1 / (+this.value))
+                D('notes-per-octave-text').innerHTML = this.value
+                K.update()
+            ">
+        </span>
+        
+        <br> <br>
+
+        <label for="pitchrange" class="text0">pitch range:</label>
+        <span id="pitch-range-text" class="text0"> 2 octaves </span> <br>
+        <input type="range" name="pitchrange" id="pitch-range" class="slider"
+        min=1 max=7 step=1 value=2
+        oninput="
+            const octs = this.value
+            D('pitch-range-text').innerHTML = `${octs} octave${octs>1?'s':''}`
+            K.octaves = octs
+            K.update()
+        ">
+
+
+
+<!-- TODO -->
+        <!-- <label for="attack" class="text0">attack:</label>
+        <span id="attack-slider-text" class="text0"> 0 </span> <br>
+        <input type="range" id="attack-slider" min="0" max="1" value="0" name="attack"
+        step="0.0000001"
+        oninput="
+            const v = D('attack-slider-text').innerHTML = +this.value
+            K.attack = v
+        "> -->
+    </div>
+    
+
+
+
+
+
+
+
+    <select id="page-select" name="pageselect"
+    oninput=" showPage(D(this.value + '-page')) ">
+        <option value="graph">          Graph           </option>
+        <option value="keyboard">       Keyboard        </option>
+        <option value="settings">       Settings        </option>
+    </select>
+
+</body>
+<script src="setup.js"></script>
+<script src="nunigraph.js"></script>
+<script src="keyboard.js"></script>
+<script src="pagehelper.js"></script>
+<script src="index.js"></script>
+<script src="handlers.js"></script>
+<script src='resize.js'></script>

@@ -1,0 +1,219 @@
+
+* {
+    color: rgb(111,111,111);
+    margin: 0;
+    padding: 0;
+    overscroll-behavior: none;
+    font-size: 30px;
+
+    touch-action: none;
+    background: transparent;
+    
+
+    /* no select */
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                                    // supported by Chrome, Opera and Firefox */
+
+}
+
+#node-edit-page {
+    // pointer-events: none;
+    padding: 7%;
+    padding-bottom: 0%;
+    background-color: rgba(144, 209, 255, 0.925);
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    border: 2px solid gray;
+    box-sizing: border-box;
+    display: none;
+}
+.selected {
+  background-color: rgba(75, 255, 96, 0.748);
+  background: rgba(75, 255, 96, 0.748);
+}
+#node-value {
+    width: 200px;
+}
+
+
+
+#graph-page {
+  display: none;
+  display: block;
+}
+
+#keyboard-page {
+  width: 100%;
+  height: 100%;
+}
+
+#page-select {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 99;
+}
+
+.page{
+  display:none;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+#settings-page {
+  padding-left: 5%;
+  padding-right: 5%;
+  width: 90%;
+  height: 90%;
+  background-color: orange;
+  background-color: white;
+  display:none;
+  grid-template-columns: auto auto;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+#node-value {
+
+    /* no select */
+    -webkit-touch-callout: all; /* iOS Safari */
+    -webkit-user-select: all; /* Safari */
+    -khtml-user-select: all; /* Konqueror HTML */
+    -moz-user-select: all; /* Old versions of Firefox */
+    -ms-user-select: all; /* Internet Explorer/Edge */
+    user-select: all; /* Non-prefixed version, currently
+                                    // supported by Chrome, Opera and Firefox */
+}
+
+  input[type=range] {
+    height: 38px;
+    -webkit-appearance: none;
+    margin: 10px 0;
+    width: 100%;
+  }
+  input[type=range]:focus {
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 10px;
+    cursor: pointer;
+    box-shadow: 1px 1px 1px #000000;
+    background: #3071A9;
+    border-radius: 5px;
+    border: 1px solid #000000;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    box-shadow: 1px 1px 1px #000000;
+    border: 1px solid #000000;
+    height: 50px;
+    width: 80px;
+    border-radius: 5px;
+    background: #FFFFFF;
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -20px;
+  }
+  input[type=range]:focus::-webkit-slider-runnable-track {
+    background: #3071A9;
+  }
+  input[type=range]::-moz-range-track {
+    width: 100%;
+    height: 10px;
+    cursor: pointer;
+    box-shadow: 1px 1px 1px #000000;
+    background: #3071A9;
+    border-radius: 5px;
+    border: 1px solid #000000;
+  }
+  input[type=range]::-moz-range-thumb {
+    box-shadow: 1px 1px 1px #000000;
+    border: 1px solid #000000;
+    height: 30px;
+    width: 15px;
+    border-radius: 5px;
+    background: #FFFFFF;
+    cursor: pointer;
+  }
+  input[type=range]::-ms-track {
+    width: 100%;
+    height: 10px;
+    cursor: pointer;
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+  }
+  input[type=range]::-ms-fill-lower {
+    background: #3071A9;
+    border: 1px solid #000000;
+    border-radius: 10px;
+    box-shadow: 1px 1px 1px #000000;
+  }
+  input[type=range]::-ms-fill-upper {
+    background: #3071A9;
+    border: 1px solid #000000;
+    border-radius: 10px;
+    box-shadow: 1px 1px 1px #000000;
+  }
+  input[type=range]::-ms-thumb {
+    margin-top: 1px;
+    box-shadow: 1px 1px 1px #000000;
+    border: 1px solid #000000;
+    height: 30px;
+    width: 15px;
+    border-radius: 5px;
+    background: #FFFFFF;
+    cursor: pointer;
+  }
+  input[type=range]:focus::-ms-fill-lower {
+    background: #3071A9;
+  }
+  input[type=range]:focus::-ms-fill-upper {
+    background: #3071A9;
+  }
+
+
+  
+#vol-slider {
+  -webkit-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+  position: absolute;
+  top:  5px;
+  left: 20px;
+  width: 100px;
+  height: 100px;
+}  
+#vol-slider::-webkit-slider-thumb {
+  box-shadow: 1px 1px 1px #000000;
+  border: 1px solid #000000;
+  height: 30px;
+  width: 40px;
+  border-radius: 5px;
+  background: #FFFFFF;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -10px;
+}
