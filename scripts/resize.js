@@ -10,5 +10,5 @@ function resizeHandler() {
     W = K.canvas.width = G.canvas.width = window.innerWidth
 
     K.update()
-    G.draw()
+    G.update()
 }

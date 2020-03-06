@@ -45,48 +45,10 @@
         <!-- NODE EDIT PAGE  -->
         <div id="node-edit-page">
 
-            <!-- NODE VALUE SELECT  -->
-            node value (0.0 - 20000):
-            <input id="node-value" type="number"
-            oninput="
-                D('node-slider').value = toSliderValue(+this.value)
-                G.selectedNode.setValue(+this.value)
-            ">
-            <input type="range" id="node-slider" min="0" value="12" max=20
-            step="1e-9"
-            oninput="
-                const v = D('node-value').value = toNodeValue(+this.value)
-                G.selectedNode.setValue(v)
-            ">
-
-
-            <!-- NEXT CHILD TYPE  -->
-            <label for="childtype">NEXT CHILD TYPE:</label>
-            <select id="child-type-select" name="childtype">
-                <option value="oscillator">oscillator</option>
-                <option value="gain">      gain      </option>
-            </select>
+            <!-- NODE TYPE AND ID  -->
+            <span id="node-edit-page-text"> This message shouldn't be here by the time the page loads. </span> 
             <br>
-
-
-            <button onclick="handleAddChild()"> 
-                add input child 
-            </button> 
-            <br>
-
-
-            <button onclick="handleAddControlChild()"> 
-                add control child 
-            </button>
-            <br>
-
-
-            <button onclick="handleDeleteNode()" style="float:right"> 
-                delete this node 
-            </button> 
-            <br>
-
-
+            
             <!-- Y-AXIS INFLUENCE VALUE -->
             <label for="y-axis-factor">Y-AXIS INFLUENCE FACTOR: </label>
             <label id="y-axis-factor-text" for="y-axis-factor"> 0 </label>
@@ -94,31 +56,122 @@
             min='0' max='9' value='0' step='0.0001' oninput="
                 G.selectedNode.yAxisFactor = +this.value
                 D('y-axis-factor-text').innerHTML = this.value
-                // G.paint()
+                G.paint()
             ">
 
 
-            <!-- OSCILLATOR ONLY  -->
+            <!-- OSCILLATOR ONLY -->
             <div id="osc-only-box">
+
+                <!-- FREQUENCY SELECT  -->
+                FREQUENCY (HZ):
+                <input id="osc-frequency-value" type="number"
+                oninput="
+                    const value = +this.value
+                    D('osc-frequency-slider').value = toSliderValue(value)
+                    G.selectedNode.setValueOf('frequency', value)
+                ">
+                <input type="range" id="osc-frequency-slider" min="0" value="12" max=20
+                step="1e-9"
+                oninput="
+                    const value = D('osc-frequency-value').value = toNodeValue(+this.value)
+                    G.selectedNode.setValueOf('frequency', value)
+                ">
+
+                <!-- OSC TYPE  -->
                 <label for="osctype">OSC TYPE:</label>
                 <select id="osc-type" name="osctype"
                 oninput="
-                    G.selectedNode.node.type = this.value
+                    G.selectedNode.audioNode.type = this.value
                 ">
                     <option value="sine">    sine    </option>
                     <option value="square">  square  </option>
                     <option value="triangle">triangle</option>
                     <option value="sawtooth">sawtooth</option>
                 </select>
+                
+                <!-- ADD CHILD  -->
+                <button onclick="
+                    // it's only interesting to connect gain nodes to oscillator nodes
+                    G.selectedNode.addChild('gain', G.selectedNode.audioNode.frequency)
+                    G.update()
 
+                "> CONTROL FROM CHILD NODE </button>
+
+                <!-- CONNECT TO KEYBOARD  -->
                 <button id="connect-osc-to-kb-btn" onclick="
-                    if (G.selectedNode.type === 'oscillator') {
-                        G.selectedNode.connectedToKeyboard ^= 1
-                        this.classList.toggle('selected')
-                        G.paint()
-                    }
-                "> CONNECT NODE TO KEYBOARD </button>
+                if (G.selectedNode.type === 'oscillator') {
+                    G.selectedNode.connectedToKeyboard ^= 1
+                    this.classList.toggle('selected')
+                    G.paint()
+                }
+                "> CONNECT OSC TO KEYBOARD </button>
             </div>
+            <!-- END OSCILLATOR ONLY -->
+
+
+            <!-- GAIN ONLY  -->
+            <div id="gain-only-box">
+
+                <!-- GAIN SELECT  -->
+                GAIN VALUE:
+                <input id="gain-value" type="number"
+                oninput="
+                    const value = +this.value
+                    D('gain-slider').value = toSliderValue(value)
+                    G.selectedNode.setValueOf('gain', this.value)
+                ">
+                <input type="range" id="gain-slider" min="0" value="12" max=20
+                step="1e-9"
+                oninput="
+                    const value = D('gain-value').value = toNodeValue(+this.value)
+                    G.selectedNode.setValueOf('gain', value)
+                ">
+
+
+
+                <label for="childtype">NEXT CHILD TYPE:</label>
+                <select id="child-type-select" name="childtype">
+                    <option value="oscillator">oscillator</option>
+                    <option value="gain">      gain      </option>
+                    <!-- <option value="filter">    filter    </option> -->
+                </select>
+
+                <button onclick="
+                    G.selectedNode.addChild(D('child-type-select').value, G.selectedNode.audioNode)
+                    G.update()
+                "> ADD CHANNEL NODE </button>
+                
+                <button onclick="
+                    G.selectedNode.addChild(D('child-type-select').value, G.selectedNode.audioNode.gain)
+                    G.update()
+                "> ADD CONTROL NODE </button>
+            </div>
+            <!-- END GAIN ONLY  -->
+
+
+            <!-- FILTER ONLY  -->
+            <div id="filter-only-box">
+                <label for="filtertype">FILTER TYPE:</label>
+                <select id="filter-type" name="filtertype"
+                oninput="
+                    G.selectedNode.audioNode.type = this.value
+                ">
+                    <option value="sine">     lowpass   </option>
+                    <option value="square">   highpass  </option>
+                    <option value="bandpass"> bandpass  </option>
+                    <option value="notch">    notch     </option>
+                    <option value="allpass">  allpass   </option>
+                </select>
+
+            </div>
+            <!-- END FILTER ONLY  -->
+
+
+            <!-- DELETE NODE  -->
+            <button onclick="handleDeleteNode()" style="float:right"> 
+                delete this node 
+            </button> 
 
             <br>
             <br>

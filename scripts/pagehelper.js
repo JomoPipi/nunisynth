@@ -21,7 +21,9 @@ function showPage(page) {
 
         // reset all the node's values
         G.nodes.forEach(node => {
-            node.node[getControlProperty[node.type]].setValueAtTime(node.value, 0)
+            for (const prop of numericalControlProperties[node.type]) {
+                node.audioNode[prop].setValueAtTime(node[prop], 0)
+            }
         })
     }
 }

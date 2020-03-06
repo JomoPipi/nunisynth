@@ -2,24 +2,57 @@
 
 // TODO: implement: collapseNode
 
+
+// const getControlProperties = {
+//     gain: 'gain',
+//     oscillator:'frequency'
+// }
+
+
+const nodetypes = {
+    OSC: 'oscillator',
+    GAIN: 'gain',
+    FILTER: 'filter'
+}
+
+const createNode = {
+    gain:'createGain',
+    oscillator:'createOscillator',
+    filter: 'createBiquadFilter'
+}
+
+// osc -- 2 sliders
+// gain -- 1 slider
+// filter 3 - 4 sliders
+const numericalControlProperties = {
+    oscillator: ['frequency','detune'],
+    gain: ['gain'],
+    filter: ['frequency','Q','detune','gain']
+}
+
+const defaultPropertyValues = {
+    frequency: 330,
+    detune: 100,
+    gain: 0.5,
+    Q: 1
+}
+
+
+
 const getControlProperty = {
     gain:'gain',
     oscillator:'frequency'
 }
 
-const createNode = {
-    gain:'createGain',
-    oscillator:'createOscillator'
-}
 
 const nodeInitialValue = {
     gain: 0.5,
-    oscillator: 330
+    oscillator: 330,
+    filter: 2
 }
 
 
 const NuniGraph = (_ => {
-
 
 
 
@@ -40,31 +73,41 @@ class GraphNode {
 
 class NuniGraphNode extends GraphNode {
 
-    constructor(parent, type, options={}){
+    constructor(parent, type, destination, options={}){
         super(parent)
-        const { nodeProp, value, doConnect, yAxisFactor } = options
-        this.type = type
-        this.connectsToNodeProp = nodeProp ? true : false
-        this.connectedToKeyboard = doConnect
-        this.yAxisFactor = yAxisFactor || 0
-        this.value = 0.5
+        const { doConnect, yAxisFactor, values={} } = options
         
-        this.node = audioCtx[createNode[type]]()
-        if (type === 'oscillator') this.node.start()
+        this.type = type
 
-        this.setValue(value || nodeInitialValue[type])
+        this.connectedToKeyboard = doConnect // oscillator only property
 
-        this.node.connect( this.parent ? 
-            nodeProp ? this.parent.node[nodeProp] : this.parent.node
-        : masterGain )
+        this.yAxisFactor = yAxisFactor || 0 // each property needs to be it's own object.. 
+        
+        this.audioNode = audioCtx[createNode[type]]()
+        if (type === nodetypes.OSC) this.audioNode.start()
+
+        for (const prop of numericalControlProperties[type]) {
+
+            this[prop] = { } // 
+
+            this.setValueOf(prop, values[prop] || defaultPropertyValues[prop])
+        }
+        
+        this.audioNode.connect(destination)
     }
-    setValue(x) {
-        this.value = x
-        this.node[getControlProperty[this.type]].setValueAtTime(x,0)
+    setValueOf(property, value) {
+        /*
+        property :: string
+        value    :: number
+        `this` stores the base values
+        `this.audioNode` stores the current values
+        */
+        this[property].value = value
+        this.audioNode[property].setValueAtTime(value, 0)
     }
 
-    addChild(type, options) {
-        const node = new NuniGraphNode(this, type, options)
+    addChild(type, destination, options) {
+        const node = new NuniGraphNode(this, type, destination, options)
         this.children.push(node)
         return this
     }
@@ -81,7 +124,7 @@ class NuniGraph {
         this.animate = true
         this.animationSpeed = 40
         this.depth = 1
-        this.root = new NuniGraphNode(null, 'gain')
+        this.root = new NuniGraphNode(null, nodetypes.GAIN, masterGain)
         this.nodeRadius = 40;
         this.nodes = [this.root]
         this.savedGain = 0.5
@@ -118,7 +161,7 @@ class NuniGraph {
                     children[i].display.x = children[i].desiredX
                     children[i].display.y = children[i].desiredY
                 }
-                this.nodes.push(children[i])
+                children[i].id = this.nodes.push(children[i])
             }
             const arr = children.reduce((a,v) => [...a,...v.children], [])
             children.splice(0,children.length, ...arr)
@@ -128,7 +171,7 @@ class NuniGraph {
 
 
     
-    draw() {
+    update() {
         this.setCoordinates()
         this.paint()
     }
@@ -145,9 +188,9 @@ class NuniGraph {
             for (const c of children) {
                 const ctkb = c.connectedToKeyboard
 
-                const cval = colorFactor * toSliderValue(c.value)
+                // const cval = colorFactor * toSliderValue((c.frequency||{}).value || (c.gain||{}).value)
                     
-                const nodeColor = 'rgb(' + [0,1,2].map(n => 100 * (1 + Math.sin(cval + n * twoThirdsPi)) |0).join`,` + ')'
+                const nodeColor = '#aaa' // 'rgb(' + [0,1,2].map(n => 100 * (1 + Math.sin(cval + n * twoThirdsPi)) |0).join`,` + ')'
                 
                 this.ctx.fillStyle = c === this.selectedNode ? 'green' : nodeColor
                 
@@ -174,7 +217,7 @@ class NuniGraph {
                 } else {
                     this.line(X, 0, X, Y)
                 }
-                this.ctx.fillStyle = 'black'
+                this.ctx.fillStyle = '#999'
 
                 this.ctx.fillText(
                     c.type,

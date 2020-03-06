@@ -1,6 +1,7 @@
 
 * {
     color: rgb(111,111,111);
+    background-color: transparent;
     margin: 0;
     padding: 0;
     overscroll-behavior: none;
@@ -23,8 +24,8 @@
 
 #node-edit-page {
     // pointer-events: none;
-    padding: 7%;
-    padding-bottom: 0%;
+    padding-left: 7%;
+    padding-right: 7%;
     background-color: rgba(144, 209, 255, 0.925);
     position: absolute;
     left: 0;
@@ -47,6 +48,7 @@
 
 
 #graph-page {
+  background-image: url('bgpic.png');
   display: none;
   display: block;
 }
@@ -202,7 +204,7 @@
   transform: rotate(-90deg);
   position: absolute;
   top:  5px;
-  left: 20px;
+  left: 7vw;
   width: 100px;
   height: 100px;
 }  
