@@ -15,6 +15,9 @@
 
 
 
+
+
+const E = x => document.createElement(x)
 const D = x => document.getElementById(x)
 const log = console.log
 
@@ -46,8 +49,6 @@ const logPHI = Math.log(PHI)
 const sliderConstant = Math.log(OSCILLATOR_MAX_FREQUENCY) / logPHI
 const twoThirdsPi = TAU / 3.0
 const colorFactor = TAU / (sliderConstant * 2)
-
-D('osc-frequency-slider').max = D('gain-slider').max = sliderConstant
 
 function toSliderValue(nodeValue) {
     return Math.round(10000 * Math.log(nodeValue + 1) / logPHI ) / 10000

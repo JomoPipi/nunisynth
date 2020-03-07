@@ -3,12 +3,6 @@
 // TODO: implement: collapseNode
 
 
-// const getControlProperties = {
-//     gain: 'gain',
-//     oscillator:'frequency'
-// }
-
-
 const nodetypes = {
     OSC: 'oscillator',
     GAIN: 'gain',
@@ -16,18 +10,18 @@ const nodetypes = {
 }
 
 const createNode = {
-    gain:'createGain',
-    oscillator:'createOscillator',
-    filter: 'createBiquadFilter'
+    [nodetypes.OSC]:    'createOscillator',
+    [nodetypes.GAIN]:   'createGain',
+    [nodetypes.FILTER]: 'createBiquadFilter'
 }
 
 // osc -- 2 sliders
 // gain -- 1 slider
 // filter 3 - 4 sliders
 const numericalControlProperties = {
-    oscillator: ['frequency','detune'],
-    gain: ['gain'],
-    filter: ['frequency','Q','detune','gain']
+    [nodetypes.OSC]:    ['frequency','detune'],
+    [nodetypes.GAIN]:   ['gain'],
+    [nodetypes.FILTER]: ['frequency','Q','detune'],//nah ,'gain']
 }
 
 const defaultPropertyValues = {
@@ -37,19 +31,6 @@ const defaultPropertyValues = {
     Q: 1
 }
 
-
-
-const getControlProperty = {
-    gain:'gain',
-    oscillator:'frequency'
-}
-
-
-const nodeInitialValue = {
-    gain: 0.5,
-    oscillator: 330,
-    filter: 2
-}
 
 
 const NuniGraph = (_ => {
@@ -79,7 +60,7 @@ class NuniGraphNode extends GraphNode {
         
         this.type = type
 
-        this.connectedToKeyboard = doConnect // oscillator only property
+        this.connectedToKeyboard = doConnect // oscillator only property (or wave inputs, too?)
 
         this.yAxisFactor = yAxisFactor || 0 // each property needs to be it's own object.. 
         
@@ -88,12 +69,19 @@ class NuniGraphNode extends GraphNode {
 
         for (const prop of numericalControlProperties[type]) {
 
-            this[prop] = { } // 
+            this[prop] = {}
 
             this.setValueOf(prop, values[prop] || defaultPropertyValues[prop])
+
+            // it may come pre-set
+            this[prop].yAxisFactor = values[prop + '_yAxisFactor'] || 0
         }
         
         this.audioNode.connect(destination)
+    }
+    setMapping(property, maptype, factor) {
+        // the Keyboard object knows what to do with this
+        this[property][maptype] = factor
     }
     setValueOf(property, value) {
         /*

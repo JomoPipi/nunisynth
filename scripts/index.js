@@ -16,7 +16,7 @@ startScreenSetup({
         ;[...Array(5)].reduce((a,_,n) =>
             a.addChild('oscillator', G.root.audioNode,
             {
-                values: {frequency: 2 ** (6 + n/PHI)},
+                values: { frequency: 2 ** (6 + n/PHI) },
                 doConnect: true
 
             }), G.root)
@@ -25,14 +25,12 @@ startScreenSetup({
             
             c.addChild('gain', c.audioNode.frequency,
             {
-                values: {gain: n * PHI},
-                yAxisFactor: 8
+                values: { gain: n * PHI, gain_yAxisFactor: 8 },
             })
             c.children[0].addChild('oscillator', c.children[0].audioNode,
             {
-                values: {frequency: 2 ** (n / TAU)},
+                values: { frequency: 2 ** (n / TAU), frequency_yAxisFactor: PHI },
                 doConnect: true,
-                yAxisFactor: PHI
             })
         })
         G.update()
@@ -71,21 +69,16 @@ function touchAction(e) {
             for (const prop of numericalControlProperties[node.type]) {
                 if (prop === 'detune') continue;
             
+                const ymap = node[prop].yAxisFactor
+                const Y = ymap < 0 ? 1 - y : y
                 const ctkb = node.connectedToKeyboard
                 const freqA = ctkb ? K.getFrequencyFactor(x) : 1
-                const freqB = (2 * y) ** node.yAxisFactor
+                const freqB = (2 * Y) ** Math.abs(ymap)
                 
                 const freq = node[prop].value * freqA * freqB
     
                 node.audioNode[prop].setValueAtTime(freq || 0, 0)
             }
-            // const ctkb = node.connectedToKeyboard
-            // const freqA = ctkb ? K.getFrequencyFactor(x) : 1
-            // const freqB = (2 * y) ** node.yAxisFactor
-            
-            // const freq = node.value * freqA * freqB
-
-            // node.audioNode[getControlProperty[node.type]].setValueAtTime(freq || 0, 0)
         })
         masterGain.gain.setValueAtTime( 0.5, 0)
     }
