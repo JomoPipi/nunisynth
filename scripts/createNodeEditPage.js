@@ -14,9 +14,25 @@ const typeTypes = {
     [nodetypes.FILTER]: ['lowpass','highpass','bandpass','notch','allpass']
 }
 
+const sliderConfig = {
+    
+}
+
+const limitfactor = {
+    frequency: 1,
+    detune: 14.1666666666666666,
+    gain: 2,
+    Q: 17
+}
 
 
 for (const type of Object.values(nodetypes)) {
+
+    const _E = x => {
+        const e = document.createElement(x)
+        e.classList.add('neumorph')
+        return e
+    }
 
     const box = E('div')
     box.id = type + '-only-box'
@@ -27,7 +43,7 @@ for (const type of Object.values(nodetypes)) {
     // add connect to keyboard stuff
 
     if (typeTypes[type]) {
-        const select = E('select')
+        const select = _E('select')
         select.id = 'type-select'
         for (const typetype of typeTypes[type]) {
             const op = E('option')
@@ -41,12 +57,13 @@ for (const type of Object.values(nodetypes)) {
     }
 
     for (const prop of numericalControlProperties[type]) {
-        const div = E('div')
+        const div = _E('div')
+        div.classList.add('height100')
         const textdiv = E('div')
         const nametext = E('span')
-        const valuetext = E('input')
-        const slider = E('input')
-        const buttons = E('div')
+        const valuetext = _E('input')
+        const slider = _E('input')
+        const buttons = _E('div')
 
         nametext.innerHTML = prop 
 
@@ -66,24 +83,23 @@ for (const type of Object.values(nodetypes)) {
         slider.step = 1e-9
         slider.id = `${type}-${prop}-slider`
         slider.oninput = function() {
-            const value = toNodeValue(+this.value)
+            const value = toNodeValue(+this.value) / limitfactor[prop]
             valuetext.value = value
             G.selectedNode.setValueOf(prop, value)
         }
         
         
         for (const _type of propertyChildrenTypes[prop]) {
-            const addChildBtn = E('button')
+            const addChildBtn = _E('button')
             addChildBtn.innerHTML = '+' + _type
             addChildBtn.onclick = function() {
-                G.selectedNode.addChild(_type, G.selectedNode.audioNode[prop])
+                G.selectedNode.addChild(_type, prop)
                 G.update()
             }
             buttons.appendChild(addChildBtn)
         }
-        const mappingsBtn = E('button')
-        mappingsBtn.style.color='#aaa'
-        mappingsBtn.style.backgroundColor='#444'
+        const mappingsBtn = _E('button')
+        mappingsBtn.style.color = '#FBB'
         mappingsBtn.innerHTML = 'MAPS'
         mappingsBtn.onclick = _ => toggleMappingsPage(prop)
         buttons.appendChild(mappingsBtn)
@@ -103,17 +119,17 @@ for (const type of Object.values(nodetypes)) {
     if (!isSourceNode[type]) {
         for (const _type of Object.values(nodetypes)) {
 
-            const channelButton = E('button')
+            const channelButton = _E('button')
             channelButton.innerHTML = _type + ' input channel'
             channelButton.onclick = function() {
-                G.selectedNode.addChild(_type, G.selectedNode.audioNode)
+                G.selectedNode.addChild(_type, 'channel')
                 G.update()
             }
 
             box.appendChild(channelButton)
         }
     } else {
-        const connectBtn = E('button')
+        const connectBtn = _E('button')
         connectBtn.id = `${type}-kb-connect`
         connectBtn.innerHTML = "pitch with keyboard"
         connectBtn.onclick = function() {
@@ -128,10 +144,13 @@ for (const type of Object.values(nodetypes)) {
 }
 
 function toggleMappingsPage(prop) {
+    const typetext = D('mapping-type-text')
     const p = D('mappings-page')
     const text = D('y-axis-factor-text')
-    D('mapping-type-text').innerHTML = prop + ' - mappings'
-    if (p.style.display === 'none') {
+    const title = prop + ' - mappings'
+    const differs = title !== typetext.innerHTML
+    typetext.innerHTML = title
+    if (differs || p.style.display === 'none') {
         p.style.display = 'block'
         const slider = D('y-axis-factor')
         text.innerHTML = 

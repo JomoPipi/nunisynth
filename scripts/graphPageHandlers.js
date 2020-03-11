@@ -1,31 +1,32 @@
 'use strict'
 
 
+
+
 G.canvas.addEventListener('mousedown', handleGraphTouch)
 
 
 
-function handleDeleteNode() {
-    const p = G.selectedNode.parent
-    if (!p) {
-        G.selectedNode.children.forEach(child => child.audioNode.disconnect())
-        G.selectedNode.children.length = 0
-    } else {
-        const i = p.children.findIndex(c => c === G.selectedNode)
-        p.children[i].audioNode.disconnect()
-        p.children.splice(i,1)
+
+function setMasterVolume(value) {
+    for (let i = 0; i < nGraphs; i++) {
+        masterGains[i].gain.setValueAtTime(G.volume = value, 0)
     }
-    G.update()
-    D('node-edit-page').style.display = 'none'
 }
 
 
+function leaveNodeEditPage() {
+    D('node-edit-page').style.display = 'none'
+    D('mappings-page').style.display = 'none'
+    G.selectedNode = null
+    G.paint()
+}
 
 
-
-
-
-
+function handleDeleteNode() {
+    G.deleteSelectedNode()
+    D('node-edit-page').style.display = 'none'
+}
 
 
 function handleGraphTouch(e) {
@@ -33,35 +34,34 @@ function handleGraphTouch(e) {
     
     const touched = G.selectedNode = G.nodes.find(({display:{x,y}}) => 
         ( (x-X)**2 + (y-Y)**2 ) ** 0.5 < G.nodeRadius)
-        
+    
     if (touched) {
         // "refill" the node-edit UI
-
-        D('node-edit-page-text').innerHTML = `${touched.type} ID: ${touched.id}`
+        
+        D('node-edit-page-text').innerHTML = `${touched.type} ${touched.id}`
         // D('y-axis-factor').value = D('y-axis-factor-text').innerHTML = touched.yAxisFactor
 
-        // switch (touched.type) {
 
-            for (const t in nodetypes) {
-                const type = nodetypes[t]
+        for (const t in nodetypes) {
+            const type = nodetypes[t]
 
-                if (touched.type === type) {
-                    if (typeTypes[touched.type]) {
-                        D('type-select').value = touched.audioNode.type
-                    }
+            if (touched.type === type) {
+                if (typeTypes[touched.type]) {
+                    D('type-select').value = touched.audioNode.type
+                }
 
-                    for (const prop of numericalControlProperties[type]) {
-                        D(`${type}-${prop}-value`).value = touched[prop].value
-                        D(`${type}-${prop}-slider`).value = toSliderValue(touched[prop].value)
-                    }
+                for (const prop of numericalControlProperties[type]) {
+                    D(`${type}-${prop}-value`).value = touched[prop].value
+                    D(`${type}-${prop}-slider`).value = toSliderValue(touched[prop].value)
+                }
 
-                    if (type === nodetypes.OSC) {
-                        D(`${type}-kb-connect`).classList[
-                            touched.connectedToKeyboard ? 'add' : 'remove'
-                        ]('selected')
-                    }
+                if (type === nodetypes.OSC) {
+                    D(`${type}-kb-connect`).classList[
+                        touched.connectedToKeyboard ? 'add' : 'remove'
+                    ]('selected')
                 }
             }
+        }
 
         //     case nodetypes.OSC:
         //         D('osc-type').value = touched.audioNode.type

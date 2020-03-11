@@ -1,39 +1,26 @@
 'use strict'
 
 // 3 types of nodes: source, effect, destination
-const G = new NuniGraph(D('nuni-graph'))
+// const G = new NuniGraph(D('nuni-graph'), masterGain)
 
+// const Graphs = [...Array(nGraphs)].map((_,i) => 
+//     new NuniGraph(i === 0 ? D('nuni-graph') : E('canvas'), {animate: i === 0})
+// )
+
+
+const G = new NuniGraph(0, D('nuni-graph'), { animate: true })
+// const G = new NuniGraph(D('nuni-graph'),masterGains[0],{animate:true})
 
 const K = new Keyboard(D('fretboard'))
 
-
+const graphs = [G]
 // get mutated by resize
 var H = K.canvas.height = G.canvas.height = window.innerHeight
 var W = K.canvas.width = G.canvas.width = window.innerWidth
 
 startScreenSetup({
     func: _ => {
-        ;[...Array(5)].reduce((a,_,n) =>
-            a.addChild('oscillator', G.root.audioNode,
-            {
-                values: { frequency: 2 ** (6 + n/PHI) },
-                doConnect: true
-
-            }), G.root)
-
-        G.root.children.forEach((c,n) =>  {
-            
-            c.addChild('gain', c.audioNode.frequency,
-            {
-                values: { gain: n * PHI, gain_yAxisFactor: 8 },
-            })
-            c.children[0].addChild('oscillator', c.children[0].audioNode,
-            {
-                values: { frequency: 2 ** (n / TAU), frequency_yAxisFactor: PHI },
-                doConnect: true,
-            })
-        })
-        G.update()
+        preset(G)[0]()
     },
     text: 'NuniSynth'
 })
@@ -52,38 +39,55 @@ K.canvas.addEventListener('touchend',  touchAction)
 
 
 
+function noteOn(i,x,y) {
 
+    graphs[i].nodes.forEach(node => {
+            
+        for (const prop of numericalControlProperties[node.type]) {
+            if (prop === 'detune') continue;
+        
+            const ymap = node[prop].yAxisFactor
+            const Y = ymap < 0 ? 1 - y : y
+            const ctkb = node.connectedToKeyboard
+            const freqA = ctkb ? K.getFrequencyFactor(x) : 1
+            const freqB = (2 * Y) ** Math.abs(ymap)
+            
+            const freq = node[prop].value * freqA * freqB
+
+            // add ADSR to these sometime?
+            node.audioNode[prop].setValueAtTime(freq || 0, 0)
+        }
+    })
+    masterGains[i].gain.exponentialRampToValueAtTime( 
+        0.5 / nGraphs, 
+        audioCtx.currentTime + 0.01
+    )
+    
+}
+
+function noteEnd(i,x,y) {
+
+    // masterEnvelope.release()
+    masterGains[i].gain.linearRampToValueAtTime( 
+        0, 
+        audioCtx.currentTime + 0.01 //(K.mg_attack + K.mg_release || 1e-3)
+    )
+}
 
 function touchAction(e) {
     const h = K.divisionLine
-    const fretTouches = [...e.touches].filter(t => t.screenY <= h).slice(0,1)
+    const fretTouches = [...e.touches].filter(t => t.screenY <= h)
     // const strumTouch = [...e.touches].find(t => t.screenY > h)
-
     // D('txt0').innerHTML = e.touches.length // fretTouches.length
-    for (let i = 0; i < Math.min(fretTouches.length,1); i++) {
+    for (let i = 0; i < Math.min(fretTouches.length, nGraphs); i++) {
         const x = fretTouches[i].clientX/W
         const y = 1 - fretTouches[i].screenY/h
 
-        G.nodes.forEach(node => {
-            
-            for (const prop of numericalControlProperties[node.type]) {
-                if (prop === 'detune') continue;
-            
-                const ymap = node[prop].yAxisFactor
-                const Y = ymap < 0 ? 1 - y : y
-                const ctkb = node.connectedToKeyboard
-                const freqA = ctkb ? K.getFrequencyFactor(x) : 1
-                const freqB = (2 * Y) ** Math.abs(ymap)
-                
-                const freq = node[prop].value * freqA * freqB
-    
-                node.audioNode[prop].setValueAtTime(freq || 0, 0)
-            }
-        })
-        masterGain.gain.setValueAtTime( 0.5, 0)
+        noteOn(i,x,y)
     }
-    if (fretTouches.length === 0) {
-        masterGain.gain.setValueAtTime( 0, 0)
+    for (let i = fretTouches.length; i < nGraphs; i++) {
+
+        noteEnd(i)
     }
     // D('debug').innerHTML = e.touches[0].screenY
     // if (strumTouch) {

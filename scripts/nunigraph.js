@@ -31,6 +31,14 @@ const defaultPropertyValues = {
     Q: 1
 }
 
+// this will tell use how a node is connected to it's parent
+const setDestination = type => {
+    return type === 'channel' ? x => x : x => x[type]
+}
+
+const markTypeConnection = {
+
+}
 
 
 const NuniGraph = (_ => {
@@ -49,24 +57,19 @@ class GraphNode {
 }
 
 
-
-
-
 class NuniGraphNode extends GraphNode {
 
-    constructor(parent, type, destination, options={}){
+    constructor(parent, type, connectionType, options={}){
         super(parent)
         const { doConnect, yAxisFactor, values={} } = options
-        
+        this.hasNuniParent = parent instanceof NuniGraphNode
         this.type = type
-
-        this.connectedToKeyboard = doConnect // oscillator only property (or wave inputs, too?)
-
-        this.yAxisFactor = yAxisFactor || 0 // each property needs to be it's own object.. 
-        
+        this.connectionType = connectionType
+        this.connectedToKeyboard = doConnect // oscillator only property (or wav inputs, too?)
+        this.yAxisFactor = yAxisFactor || 0
         this.audioNode = audioCtx[createNode[type]]()
-        if (type === nodetypes.OSC) this.audioNode.start()
 
+        if (type === nodetypes.OSC) this.audioNode.start()
         for (const prop of numericalControlProperties[type]) {
 
             this[prop] = {}
@@ -77,7 +80,10 @@ class NuniGraphNode extends GraphNode {
             this[prop].yAxisFactor = values[prop + '_yAxisFactor'] || 0
         }
         
-        this.audioNode.connect(destination)
+        const location = setDestination(connectionType)(this.hasNuniParent ? parent.audioNode : parent)
+        // console.log('loc = ',this.type, parent, connectionType)
+        
+        this.audioNode.connect(location)
     }
     setMapping(property, maptype, factor) {
         // the Keyboard object knows what to do with this
@@ -93,29 +99,97 @@ class NuniGraphNode extends GraphNode {
         this[property].value = value
         this.audioNode[property].setValueAtTime(value, 0)
     }
-
-    addChild(type, destination, options) {
-        const node = new NuniGraphNode(this, type, destination, options)
+    // connectionType
+    addChild(type, connectionType, options) {
+        const node = new NuniGraphNode(this, type, connectionType, options)
         this.children.push(node)
         return this
+    }
+
+    addEntireGraph(root) {
+
+        const values = numericalControlProperties[root.type].reduce((a,v) => 
+            (a[v] = root[v].value, a)
+        , {})
+        for (const prop of numericalControlProperties[root.type]) {
+            values[prop + '_yAxisFactor'] = root[prop].yAxisFactor || 0
+        }
+        const settings = {
+            doConnect: root.connectedToKeyboard,
+            yAxisFactor: root.yAxisFactor,
+            values: values
+        }
+        this.addChild(root.type, root.connectionType, settings)
+        const kid = this.children.slice(-1)[0]
+        kid.display = root.display
+        for (const child of root.children) {
+            kid.addEntireGraph(child)
+        }
+    }
+
+    wipe() { 
+        const p = this.parent
+        if (!p || !this.hasNuniParent) {
+            this.children.forEach(child => child.audioNode.disconnect())
+            this.children.length = 0
+        } else {
+            const i = p.children.findIndex(c => c === this)
+            p.children[i].audioNode.disconnect()
+            p.children.splice(i,1)
+        }
+    }
+
+}
+
+
+class BaseGraph {
+    constructor (i) {
+        this.root = new NuniGraphNode(masterGains[i], nodetypes.GAIN, 'channel')
+        this.nodes = [this.root]
+        this.volume = 0.5
+        this.selectedNode = null
+    }
+
+
+    
+
+    deleteSelectedNode() {
+        this.selectedNode.wipe()
+        this.selectedNode = null
+        typeof this.update === 'function' && this.update()
     }
 }
 
 
 
 
-
-class NuniGraph {
-    constructor(canvas) {
+class NuniGraph extends BaseGraph {
+    constructor(i, canvas, { animate }) {
+        super(i)
         this.canvas = canvas
         this.ctx = canvas.getContext('2d')
-        this.animate = true
+        this.animate = animate
         this.animationSpeed = 40
         this.depth = 1
-        this.root = new NuniGraphNode(null, nodetypes.GAIN, masterGain)
         this.nodeRadius = 40;
-        this.nodes = [this.root]
-        this.savedGain = 0.5
+    }
+
+
+
+    
+    copy(i) {
+        const G = new NuniGraph(i, E('canvas'), {})
+
+        G.root.gain.value = this.root.gain.value
+        G.root.yAxisFactor = this.root.yAxisFactor
+        for (const prop of numericalControlProperties[this.root.type]) {
+            G.root[prop].yAxisFactor = this.root[prop].yAxisFactor || 0
+        }
+        
+        for (const kid of this.root.children)
+            G.root.addEntireGraph(kid)
+
+        return G
     }
     
 
@@ -172,32 +246,46 @@ class NuniGraph {
         let isComplete = true
         this.ctx.font = "20px Georgia";
         this.ctx.lineWidth = 4
+        
         while (children.length) {
             for (const c of children) {
                 const ctkb = c.connectedToKeyboard
 
-                // const cval = colorFactor * toSliderValue((c.frequency||{}).value || (c.gain||{}).value)
+                const prop = numericalControlProperties[c.type][0]
+                const pValue = c[prop].value
+                const mValue = c[prop].yAxisFactor
+
+                const cval = colorFactor * toSliderValue(pValue)
+                const c1 = 'rgb(' + [0,1,2].map(n => 100 * (1 + Math.sin(cval + n * twoThirdsPi)) |0).join`,` + ')'
+                const c2 = `rgb(${[0,0,0].map(_ => 256.0 * (1 - Math.abs(mValue / 9.0)) ).join`,`})`
+
+                const {x,y} = c.display, r = this.nodeRadius
+
+                const gradient = this.ctx.createRadialGradient(x, y, r/4, x, y, r)
+                    gradient.addColorStop(0, c1)
+                    gradient.addColorStop(0.9, c2)
+
                     
-                const nodeColor = '#aaa' // 'rgb(' + [0,1,2].map(n => 100 * (1 + Math.sin(cval + n * twoThirdsPi)) |0).join`,` + ')'
+                const nodeColor = gradient 
                 
-                this.ctx.fillStyle = c === this.selectedNode ? 'green' : nodeColor
+                this.ctx.fillStyle = c === this.selectedNode ? 'red' : nodeColor
                 
                 const [R,G,B] = [0, (c.yAxisFactor * 255 / 9.0 | 0), (+ctkb||0) * 255]
 
                 this.ctx.strokeStyle = `rgb(${R},${G},${B})`
 
-                const {x,y} = c.display
+                const tooSmall = Math.abs(c.desiredX - x) < 1 && Math.abs(c.desiredY - y) < 1
 
-                const [X,Y] = this.animate ? [
+                const [X,Y] = this.animate && !tooSmall ? [
                     (x||0) + (c.desiredX - x) / this.animationSpeed,
                     (y||0) + (c.desiredY - y) / this.animationSpeed
                 ] : 
                     [c.desiredX, c.desiredY]
                 
-                this.circle(X, Y, this.nodeRadius)
+                this.circle(X, Y, r)
 
                 this.ctx.strokeStyle = 'red'
-                if (c.parent) {
+                if (c.hasNuniParent) {
                     this.line(X, Y,
                         c.parent.display.x,
                         c.parent.display.y
@@ -207,10 +295,12 @@ class NuniGraph {
                 }
                 this.ctx.fillStyle = '#999'
 
-                this.ctx.fillText(
-                    c.type,
-                    X - this.nodeRadius,
-                    Y - this.nodeRadius - 10)
+                if (D('node-edit-page').style.display !== 'block') { // the text would otherwise get in the way
+                    this.ctx.fillText(
+                        c.type,
+                        X - r,
+                        Y - r - 10)
+                }
 
                 c.display.x = X
                 c.display.y = Y
@@ -221,7 +311,7 @@ class NuniGraph {
             
         }
         if (!isComplete) {
-            requestAnimationFrame(this.paint.bind(this))
+            requestAnimationFrame(_ => this.paint())
         }
     }
 

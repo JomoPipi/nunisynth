@@ -24,7 +24,7 @@
 
 
 
-    <!-- <span id="debug" style="position: absolute; top:0; left: 0; z-index:999;" > debug</span> -->
+    <!-- <span id="debug" style="position: absolute; top:0; left: 0; z-index:999;">  DEBUG </span> -->
 
 
 
@@ -34,8 +34,8 @@
 
 
         <!-- MASTER VOLUME -->
-        <input type="range" id="vol-slider" min=0 max=0.5 step=0.0001 value=0.5
-            oninput=" masterGain.gain.setValueAtTime(G.savedGain = +this.value, 0) ">
+        <input type="range" id="vol-slider" min=0 max=0.125 step=0.0001 value=0.125 
+            oninput="setMasterVolume(+this.value)">
 
 
         <!-- THE GRAPH ITSELF  -->
@@ -45,51 +45,34 @@
         <!-- NODE EDIT PAGE  -->
         <div id="node-edit-page">
 
-            <button style="font-size:2em" onclick="
-                D('node-edit-page').style.display = 'none'
-                D('mappings-page').style.display = 'none'
-                G.selectedNode = null
-                G.paint()
-            "> &lt;= </button>
+            <button class="neumorph"
+                onclick="leaveNodeEditPage()"> back &lt;= </button> <br> <br>
 
             <!-- NODE TYPE AND ID  -->
             <span id="node-edit-page-text"> This message shouldn't be here by the time the page loads. </span> 
             <br>
-            
-            <!-- Y-AXIS INFLUENCE VALUE -->
-            <!-- <label for="y-axis-factor">Y-AXIS INFLUENCE FACTOR: </label>
-            <label id="y-axis-factor-text" for="y-axis-factor"> 0 </label>
-            <input type="range" id='y-axis-factor' name='y-axis-factor' 
-            min='0' max='9' value='0' step='0.0001' oninput="
-                G.selectedNode.yAxisFactor = +this.value
-                D('y-axis-factor-text').innerHTML = this.value
-                G.paint()
-            "> -->
 
-            <!-- OSCILLATOR ONLY -->
+            <div id="osc-gain-filter">
+                <!-- SEE "createNodeEditPage.js"  -->
+            </div>
 
-            <div id="osc-gain-filter"></div>
-
-            <div id="mappings-page" style="display: none;">
+            <div id="mappings-page" style="display: none;" class="neumorph">
                 <div id="mapping-type-text"></div>
                 <span> y-axis connection with keyboard: </span>
                 <span id="y-axis-factor-text"></span>
-                <input type="range" id="y-axis-factor" min=-9 max=9 value=0 step=0.125>
+                <input type="range" id="y-axis-factor" class="neumorph" min=-9 max=9 value=0 step=0.125>
             </div>
 
 
             <!-- DELETE NODE  -->
-            <button onclick="handleDeleteNode()" style="position: absolute; bottom:0; right: 0;"> 
-                delete this node 
-            </button> 
-
-            <br>
-            <br>
+            <button style="position: absolute; bottom:0; right: 0;"
+                onclick="handleDeleteNode()"> delete this node </button> 
 
         </div>
         <!-- END NODE EDIT PAGE -->
 
-
+        <!-- PRESETS  -->
+        <div id="presets"></div>
     </div>
     <!-- END GRAPH PAGE  -->
 
@@ -179,15 +162,7 @@
 
 
 
-<!-- TODO -->
-        <!-- <label for="attack" class="text0">attack:</label>
-        <span id="attack-slider-text" class="text0"> 0 </span> <br>
-        <input type="range" id="attack-slider" min="0" max="1" value="0" name="attack"
-        step="0.0000001"
-        oninput="
-            const v = D('attack-slider-text').innerHTML = +this.value
-            K.attack = v
-        "> -->
+
     </div>
 
 
@@ -210,15 +185,19 @@
     oninput=" showPage(D(this.value + '-page')) ">
         <option value="graph">          Graph           </option>
         <option value="keyboard">       Keyboard        </option>
-        <option value="settings">       Settings        </option>
+        <option value="settings">       Keyboard Settings </option>
     </select>
 
 </body>
+
 <script src="scripts/setup.js"></script>
 <script src="scripts/nunigraph.js"></script>
 <script src='scripts/createNodeEditPage.js'></script>
 <script src="scripts/keyboard.js"></script>
 <script src="scripts/pagehelper.js"></script>
 <script src="scripts/index.js"></script>
-<script src="scripts/handlers.js"></script>
 <script src='scripts/resize.js'></script>
+<script src='scripts/graphPageHandlers.js'></script>
+<script src='/scripts/presets.js'></script>
+
+</html>

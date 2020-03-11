@@ -29,15 +29,34 @@ const log = console.log
 // web audio API declaration
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
 
-const masterGain = audioCtx.createGain()
-    masterGain.gain.setValueAtTime(0.5, 0)
-    masterGain.connect(audioCtx.destination)
+// const masterGain = audioCtx.createGain()
+//     masterGain.gain.setValueAtTime(0.5, 0)
+//     masterGain.connect(audioCtx.destination)
 
+const nGraphs = 3
 
+const masterGains = [...Array(nGraphs)].map(_ => {
+    
+    const gain = audioCtx.createGain()
+    gain.gain.setValueAtTime(0.5 / nGraphs, 0)
+    gain.connect(audioCtx.destination)
+    return gain
+})
 
-
-
-
+    
+// var masterEnvelope;
+// try{
+//     masterEnvelope = ADSRNode(audioCtx, {
+//         attack: 0.1,
+//         decay: 0.2,
+//         sustain: 0.6,
+//         release: 0.3
+//     })
+//        masterEnvelope.connect(masterGain.gain)
+//        masterEnvelope.start()
+// } catch(e) {
+//     document.body.innerHTML = 'we have an error:<br>' + e
+// }
 
 
 // spec says 24000, but I can only hear up to 17k.
