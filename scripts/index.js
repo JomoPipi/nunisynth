@@ -1,22 +1,16 @@
 'use strict'
 
 // 3 types of nodes: source, effect, destination
-// const G = new NuniGraph(D('nuni-graph'), masterGain)
-
-// const Graphs = [...Array(nGraphs)].map((_,i) => 
-//     new NuniGraph(i === 0 ? D('nuni-graph') : E('canvas'), {animate: i === 0})
-// )
 
 
-const G = new NuniGraph(0, D('nuni-graph'), { animate: true })
-// const G = new NuniGraph(D('nuni-graph'),masterGains[0],{animate:true})
+const G = new NuniGraph(masterGain, D('nuni-graph'), { animate: true })
 
-const K = new Keyboard(D('fretboard'))
+const KB = new Keyboard(D('fretboard'))
 
-const graphs = [G]
+const graphs = []
 // get mutated by resize
-var H = K.canvas.height = G.canvas.height = window.innerHeight
-var W = K.canvas.width = G.canvas.width = window.innerWidth
+var H = KB.canvas.height = G.canvas.height = window.innerHeight
+var W = KB.canvas.width = G.canvas.width = window.innerWidth
 
 startScreenSetup({
     func: _ => {
@@ -26,69 +20,135 @@ startScreenSetup({
 })
 
 
-K.update()
+KB.update()
 G.update()
 
 
-K.canvas.addEventListener('touchstart',touchAction)
-K.canvas.addEventListener('touchmove', touchAction)
-K.canvas.addEventListener('touchend',  touchAction)
-// K.canvas.addEventListener('pointermove',mouseAction) // TODO: listen for key-down and key-up events, unless using continuous mouse
-// K.canvas.addEventListener('pointerout', mouseAction)
+KB.canvas.addEventListener('touchstart',touchAction)
+KB.canvas.addEventListener('touchmove', touchAction)
+KB.canvas.addEventListener('touchend',  touchAction)
+// KB.canvas.addEventListener('pointermove',mouseAction) // TODO: listen for key-down and key-up events, unless using continuous mouse
+// KB.canvas.addEventListener('pointerout', mouseAction)
 
 
 
+const lowVol = 1e-2
 
-function noteOn(i,x,y) {
+function noteEnd(adsr) {
+    
+    const release = ADSR[3]
+    const t = audioCtx.currentTime
+    adsr.gain.cancelScheduledValues(t)
+    adsr.gain.setValueAtTime(adsr.gain.value, t)
+    adsr.gain.setTargetAtTime(0, t, release)
 
-    graphs[i].nodes.forEach(node => {
-            
+    const stop = setInterval(() => {
+        if (adsr.gain.value < lowVol) {
+            adsr.gain.cancelScheduledValues(t)
+            adsr.gain.setValueAtTime(adsr.gain.value, t)
+            adsr.gain.setTargetAtTime(0, t, release)
+            const i = graphs.findIndex(g => g.adsr === adsr)
+            const g = graphs.splice(i,1)[0]
+            graphs.unshift(g)
+            clearInterval(stop)
+        }
+    }, 10);
+}
+
+function holdNote(x,y) {
+    const [ffactor, keynum] = KB.getFrequencyFactorAndKeyNumber(x)
+    const newlyHeld = KB.keyConnectsTo[keynum] == null
+    if (newlyHeld) {
+        log('graphs = ',graphs)
+        const g = graphs.shift()
+        KB.keyConnectsTo[keynum] = g.adsr
+        g.adsr.graph = g
+        graphs.push(g)
+    }
+    const adsr = KB.keyConnectsTo[keynum]
+    
+    adsr.graph.nodes.forEach(node => {
         for (const prop of numericalControlProperties[node.type]) {
             if (prop === 'detune') continue;
         
             const ymap = node[prop].yAxisFactor
             const Y = ymap < 0 ? 1 - y : y
             const ctkb = node.connectedToKeyboard
-            const freqA = ctkb ? K.getFrequencyFactor(x) : 1
+            const freqA = ctkb ? ffactor : 1
             const freqB = (2 * Y) ** Math.abs(ymap)
             
-            const freq = node[prop].value * freqA * freqB
+            const value = node[prop].value * freqA * freqB
 
             // add ADSR to these sometime?
-            node.audioNode[prop].setValueAtTime(freq || 0, 0)
+            node.audioNode[prop].setValueAtTime(value|| 0, 0)
         }
     })
-    masterGains[i].gain.exponentialRampToValueAtTime( 
-        0.5 / nGraphs, 
-        audioCtx.currentTime + 0.01
-    )
-    
-}
 
-function noteEnd(i,x,y) {
+    if (newlyHeld || adsr.gain.value < lowVol) { // let's make this exponential ramp-up a bit easier.
+        
+        const [atk,dec,sus] = ADSR
 
-    // masterEnvelope.release()
-    masterGains[i].gain.linearRampToValueAtTime( 
-        0, 
-        audioCtx.currentTime + 0.01 //(K.mg_attack + K.mg_release || 1e-3)
-    )
+        const t = audioCtx.currentTime
+        adsr.gain.cancelScheduledValues(t)
+        if (adsr.gain.value < lowVol)
+            adsr.gain.setValueAtTime(lowVol, t)
+
+        // attack
+        const t1 = t + atk
+        adsr.gain.exponentialRampToValueAtTime(G.volume, t1) // G.volume for 1?
+
+        // decay
+        adsr.gain.setTargetAtTime(sus, t1, dec)
+    }
+
+    return keynum
 }
 
 function touchAction(e) {
-    const h = K.divisionLine
-    const fretTouches = [...e.touches].filter(t => t.screenY <= h)
+    const h = KB.divisionLine
+    const fretTouches = [...e.touches].filter(t => t.screenY <= h).slice(0,nGraphs)
+    const presses = new Set()
     // const strumTouch = [...e.touches].find(t => t.screenY > h)
     // D('txt0').innerHTML = e.touches.length // fretTouches.length
-    for (let i = 0; i < Math.min(fretTouches.length, nGraphs); i++) {
-        const x = fretTouches[i].clientX/W
-        const y = 1 - fretTouches[i].screenY/h
 
-        noteOn(i,x,y)
-    }
-    for (let i = fretTouches.length; i < nGraphs; i++) {
+    // try {
 
-        noteEnd(i)
-    }
+
+
+        fretTouches.forEach(t => {
+            const x = t.clientX/W
+            const y = 1 - t.screenY/h
+    
+            const keyNumber = holdNote(x,y)
+            presses.add(keyNumber)
+        })
+        
+        for (const i in KB.keyConnectsTo) {
+            if (!presses.has(+i)) {
+                if (KB.keyConnectsTo[i]) {
+                    noteEnd(KB.keyConnectsTo[i])
+                }
+                KB.keyConnectsTo[i] = null
+            }
+        }
+    
+
+
+    // } catch (e) {
+    //     showErr(e)
+    // }
+    // for (let i = 0; i < fretTouches.length; i++) {
+    //     const x = fretTouches[i].clientX/W
+    //     const y = 1 - fretTouches[i].screenY/h
+
+    //     noteOn(i,x,y)
+    // }
+    // for (let i = fretTouches.length; i < nGraphs; i++) {
+
+    //     noteEnd(i)
+    // }
+    // debug(fretTouches.length)
+    
     // D('debug').innerHTML = e.touches[0].screenY
     // if (strumTouch) {
     //     const [x,y] = [strumTouch.screenX,strumTouch.screenY]
@@ -106,34 +166,9 @@ function touchAction(e) {
     //     ctx.moveTo(0,y)
     //     ctx.lineTo(W,y)
     //     ctx.stroke()
-    //     K.pitchBend = (x => 1 + x*x)((y-k)/(H-k))
+    //     KB.pitchBend = (x => 1 + x*x)((y-k)/(H-k))
 
     //     lfo.frequency.value = x/W < 0.01 ? 0 :
     //         x ** 1.618033988/W
     // }
 }
-
-
-
-
-// function mouseAction(e) {
-//     let b = false
-//     for (let i = 0; i < 1/*fretTouches.length*/; i++) {
-//         const x = e.clientX/W
-//         const y = e.clientY/K.divisionLine
-//         b = y > 1
-//         G.nodes.forEach(node => {
-//             if (!node.connectedToKeyboard) return;
-
-//             const freq =  node.value * K.getFrequencyFactor(x)
-               
-//             node.audioNode.frequency.setValueAtTime( freq, 0)
-//         })
-//         const gain = (x => x*x) (1 - y)
-        
-//         masterGain.gain.setValueAtTime(gain, 0)
-//     }
-//     if (b) {
-//         masterGain.gain.setValueAtTime(0 ,0)
-//     }
-// }

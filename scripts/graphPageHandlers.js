@@ -10,7 +10,7 @@ G.canvas.addEventListener('mousedown', handleGraphTouch)
 
 function setMasterVolume(value) {
     for (let i = 0; i < nGraphs; i++) {
-        masterGains[i].gain.setValueAtTime(G.volume = value, 0)
+        masterGain.gain.setValueAtTime(G.volume = value/2.0, 0)
     }
 }
 

@@ -27,6 +27,7 @@ const preset = G => {
             })
             G.root.gain.yAxisFactor = PHI
             G.update()
+            debug('g=',G.nodes.length)
         },
 
         1: _ => {
@@ -60,6 +61,7 @@ const preset = G => {
             })
             G.root.gain.yAxisFactor = PHI
             G.update()
+            debug('g=',G.nodes.length)
         },
         
         2: _ => {
@@ -75,7 +77,7 @@ const preset = G => {
                 }), G.root)
     
             G.root.children.forEach((c,n) =>  {
-                
+
                 c.audioNode.type = 'highpass'
                 c.addChild('oscillator', 'channel',
                 {
@@ -109,6 +111,7 @@ const preset = G => {
             })
             G.root.gain.yAxisFactor = PHI
             G.update()
+            debug('g=',G.nodes.length)
         },
     }
 }

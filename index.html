@@ -24,7 +24,7 @@
 
 
 
-    <!-- <span id="debug" style="position: absolute; top:0; left: 0; z-index:999;">  DEBUG </span> -->
+    <span id="debug" style="position: absolute; top:0; left: 0; z-index:999;">  DEBUG </span>
 
 
 
@@ -35,7 +35,7 @@
 
         <!-- MASTER VOLUME -->
         <input type="range" id="vol-slider" min=0 max=0.125 step=0.0001 value=0.125 
-            oninput="setMasterVolume(+this.value)">
+            oninput="setMasterVolume(+this.value/4)">
 
 
         <!-- THE GRAPH ITSELF  -->
@@ -121,12 +121,11 @@
         <label for="keyboardmode"> Keyboard Mode: </label>
         <select id="keyboard-mode" name="keyboardmode"
             oninput="
-                K.kbMode = this.value
+                KB.kbMode = this.value
                 D('notes-per-octave-box').style.display = this.value === 'chromatic' ? 'inline' : 'none'
-                K.update()
+                KB.update()
             ">
             <option value="scale">      scale       </option>
-            <option value="continuous"> continuous  </option>
             <option value="chromatic">  chromatic   </option>
         </select>
 
@@ -139,10 +138,10 @@
             <input type="range" id="notes-per-octave" class="slider"
             min=1 max=24 step=1 value=12 name='npo'
             oninput="
-                K.notesPerOctave = +this.value
-                K.NRT2 = 2 ** (1 / (+this.value))
+                KB.notesPerOctave = +this.value
+                KB.NRT2 = 2 ** (1 / (+this.value))
                 D('notes-per-octave-text').innerHTML = this.value
-                K.update()
+                KB.update()
             ">
         </span>
         
@@ -156,12 +155,30 @@
         oninput="
             const octs = this.value
             D('pitch-range-text').innerHTML = `${octs} octave${octs>1?'s':''}`
-            K.octaves = octs
-            K.update()
+            KB.octaves = octs
+            KB.update()
         ">
 
+        <!-- ADSR -->
+        <br> attack
+        <input type="range" class="slider"
+        min=0 max=1 step=0.00001 value=0
+        oninput="ADSR[0] = +this.value">
+        
+        <br> decay
+        <input type="range" class="slider"
+        min=0 max=1 step=0.00001 value=0
+        oninput="ADSR[1] = +this.value">
 
-
+        <br> sustain
+        <input type="range" class="slider"
+        min=0 max=0.5 step=0.00001 value=0 
+        oninput="ADSR[2] = +this.value">
+        
+        <br> release
+        <input type="range" class="slider"
+        min=0 max=2 step=0.00001 value=0
+        oninput="ADSR[3] = +this.value">
 
     </div>
 

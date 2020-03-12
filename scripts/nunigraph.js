@@ -39,8 +39,6 @@ const setDestination = type => {
 const markTypeConnection = {
 
 }
-
-
 const NuniGraph = (_ => {
 
 
@@ -62,6 +60,7 @@ class NuniGraphNode extends GraphNode {
     constructor(parent, type, connectionType, options={}){
         super(parent)
         const { doConnect, yAxisFactor, values={} } = options
+        this.volume = 0.5
         this.hasNuniParent = parent instanceof NuniGraphNode
         this.type = type
         this.connectionType = connectionType
@@ -143,8 +142,9 @@ class NuniGraphNode extends GraphNode {
 
 
 class BaseGraph {
-    constructor (i) {
-        this.root = new NuniGraphNode(masterGains[i], nodetypes.GAIN, 'channel')
+    constructor (adsr) {
+        this.root = new NuniGraphNode(adsr, nodetypes.GAIN, 'channel')
+        this.adsr = adsr
         this.nodes = [this.root]
         this.volume = 0.5
         this.selectedNode = null
@@ -164,8 +164,8 @@ class BaseGraph {
 
 
 class NuniGraph extends BaseGraph {
-    constructor(i, canvas, { animate }) {
-        super(i)
+    constructor(adsr, canvas, { animate }) {
+        super(adsr)
         this.canvas = canvas
         this.ctx = canvas.getContext('2d')
         this.animate = animate
@@ -177,8 +177,9 @@ class NuniGraph extends BaseGraph {
 
 
     
-    copy(i) {
-        const G = new NuniGraph(i, E('canvas'), {})
+    copy(adsr) {
+        
+        const G = new NuniGraph(adsr, E('canvas'), {})
 
         G.root.gain.value = this.root.gain.value
         G.root.yAxisFactor = this.root.yAxisFactor
@@ -186,10 +187,11 @@ class NuniGraph extends BaseGraph {
             G.root[prop].yAxisFactor = this.root[prop].yAxisFactor || 0
         }
         
-        for (const kid of this.root.children)
+        for (const kid of this.root.children.slice())
             G.root.addEntireGraph(kid)
-
+            
         return G
+
     }
     
 
@@ -233,7 +235,7 @@ class NuniGraph extends BaseGraph {
 
 
     
-    update() {
+    update() {    
         this.setCoordinates()
         this.paint()
     }
@@ -337,5 +339,6 @@ class NuniGraph extends BaseGraph {
 }
 
 return NuniGraph
+
 
 })()

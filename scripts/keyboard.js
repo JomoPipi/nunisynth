@@ -26,29 +26,42 @@ class Keyboard {
         this.notesPerOctave = 12
         this.divisionLinePercent = 1 // 0.65
         this.divisionLine = canvas.height * 0.65
+        this.keyConnectsTo = {}
     }
     
 
     getFrequencyFactor(x) {
-        const range = this.octaves
+        const keyNumber = x * this.notesPerOctave * this.octaves | 0
         return (
-            this.kbMode === 'continuous' ?
-                2 ** (1 + this.surplus * range * x) :
-
             this.kbMode === 'chromatic' ?
-                this.NRT2 ** (x * this.notesPerOctave * range | 0) :
-        
 
-                TR2 ** scaleSteps[x * 7 * range | 0])
+                this.NRT2 ** keyNumber :
+
+                TR2 ** scaleSteps[keyNumber])
+    }
+
+    
+    getFrequencyFactorAndKeyNumber(x) {
+        const keyNumber = x * this.notesPerOctave * this.octaves | 0
+        return [
+            this.kbMode === 'chromatic' ?
+
+                this.NRT2 ** keyNumber :
+
+                TR2 ** scaleSteps[keyNumber]
+            
+            , keyNumber]
     }
 
 
-    update() {
 
+    update() {
+        
+        const range = this.octaves
         const k = this.divisionLine = this.divisionLinePercent * H
-        const continuousMode = this.kbMode === 'continuous'
         const scaleMode = this.kbMode === 'scale'
-        const n = scaleMode ? 7 : this.notesPerOctave
+        const n = (this.notesPerOctave = scaleMode ? 7 : this.notesPerOctave) // updates this.notesPerOctave to 7 when needed
+        
         
         const keycolor = [...Array(n)].map((_,i) => {
             
@@ -58,39 +71,29 @@ class Keyboard {
                 ')')
         })
 
-
         this.ctx.strokeStyle = 'white'
-        this.ctx.lineWidth = 25 / (n * this.octaves)
-        for (let i = 0; i <= this.octaves; i++) {
-            const w = continuousMode ? W / this.surplus : W
-            const dx = (1/this.octaves) * w
+        this.ctx.lineWidth = 25 / (n * range)
+
+        for (let i = 0, count = 0; i <= range; i++) {
+
+            const dx = (1/range) * W
             const [a,b] = [i * dx,(i+1) * dx]
             
+            for (let j = 0; j < n; j++) {
     
-            if (continuousMode) {
-                const gradient = this.ctx.createLinearGradient(a,0,b,0)
-
-                gradient.addColorStop(0, 'orange')
-                gradient.addColorStop(.5, 'blue')
-                gradient.addColorStop(1, 'violet')
+                this.keyConnectsTo[count++] = null
+                const gradient = this.ctx.createLinearGradient(a,0,a,k)
+                this.ctx.createLinearGradient
+                
+                for (let z = 0; z > -12; z--)
+                    gradient.addColorStop( PHI ** z, keycolor[j][Math.abs(z) % 3])
 
                 this.ctx.fillStyle = gradient
-                this.ctx.fillRect(a, 0, b, k)
-            } else {
-                for (let j = 0; j < n; j++) {
-                    const gradient = this.ctx.createLinearGradient(a,0,a,k)
-                    this.ctx.createLinearGradient
-                    
-                    for (let z = 0; z > -12; z--)
-                        gradient.addColorStop( PHI ** z, keycolor[j][Math.abs(z) % 3])
-
-                    this.ctx.fillStyle = gradient
-                    this.ctx.beginPath()
-                    this.ctx.rect(a + dx*j/n, 0, dx, k)
-                    this.ctx.fill()
-                    this.ctx.stroke()
-                    this.ctx.closePath()
-                }
+                this.ctx.beginPath()
+                this.ctx.rect(a + dx*j/n, 0, dx, k)
+                this.ctx.fill()
+                this.ctx.stroke()
+                this.ctx.closePath()
             }
         }
     }

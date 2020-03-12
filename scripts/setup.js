@@ -13,13 +13,23 @@
 
 
 
+function showErr(e) {
+    (p => (
+        p.style.font = '2em Arial Black',
+        p.innerHTML = e
+    ))(document.body)
+}
+function debug(...x) {
+    D('debug').innerHTML = x.join`<br>`
+}
+const log = console.log
+
 
 
 
 
 const E = x => document.createElement(x)
 const D = x => document.getElementById(x)
-const log = console.log
 
 
 
@@ -35,6 +45,11 @@ const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
 
 const nGraphs = 3
 
+const masterGain = audioCtx.createGain()
+    masterGain.gain.setValueAtTime(0.5 / nGraphs, 0)
+    masterGain.connect(audioCtx.destination)
+
+
 const masterGains = [...Array(nGraphs)].map(_ => {
     
     const gain = audioCtx.createGain()
@@ -43,6 +58,7 @@ const masterGains = [...Array(nGraphs)].map(_ => {
     return gain
 })
 
+const ADSR = [0.05, .04, .145, .06]
     
 // var masterEnvelope;
 // try{
