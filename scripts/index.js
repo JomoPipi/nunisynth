@@ -16,7 +16,7 @@ startScreenSetup({
     func: _ => {
         preset(G)[0]()
     },
-    text: 'NuniSynth'
+    text: 'NuniSynth <br><br><br><br> version 0.1'
 })
 
 
@@ -56,10 +56,10 @@ function noteEnd(adsr) {
 }
 
 function holdNote(x,y) {
-    const [ffactor, keynum] = KB.getFrequencyFactorAndKeyNumber(x)
+    const [pitchFactor, vertFactor, keynum] = KB.getFrequencyFactorsAndKeyNumber(x,y)
     const newlyHeld = KB.keyConnectsTo[keynum] == null
     if (newlyHeld) {
-        log('graphs = ',graphs)
+        // log('graphs = ',graphs)
         const g = graphs.shift()
         KB.keyConnectsTo[keynum] = g.adsr
         g.adsr.graph = g
@@ -67,14 +67,15 @@ function holdNote(x,y) {
     }
     const adsr = KB.keyConnectsTo[keynum]
     
+    
     adsr.graph.nodes.forEach(node => {
         for (const prop of numericalControlProperties[node.type]) {
             if (prop === 'detune') continue;
         
             const ymap = node[prop].yAxisFactor
-            const Y = ymap < 0 ? 1 - y : y
+            const Y = ymap > 0 ? 1 - vertFactor : vertFactor
             const ctkb = node.connectedToKeyboard
-            const freqA = ctkb ? ffactor : 1
+            const freqA = ctkb ? pitchFactor : 1
             const freqB = (2 * Y) ** Math.abs(ymap)
             
             const value = node[prop].value * freqA * freqB
@@ -84,18 +85,17 @@ function holdNote(x,y) {
         }
     })
 
-    if (newlyHeld || adsr.gain.value < lowVol) { // let's make this exponential ramp-up a bit easier.
+    if (newlyHeld) {
         
         const [atk,dec,sus] = ADSR
 
         const t = audioCtx.currentTime
         adsr.gain.cancelScheduledValues(t)
-        if (adsr.gain.value < lowVol)
-            adsr.gain.setValueAtTime(lowVol, t)
+        // adsr.gain.setValueAtTime(0,t)
 
         // attack
         const t1 = t + atk
-        adsr.gain.exponentialRampToValueAtTime(G.volume, t1) // G.volume for 1?
+        adsr.gain.linearRampToValueAtTime(G.volume, t1) // G.volume for 1?
 
         // decay
         adsr.gain.setTargetAtTime(sus, t1, dec)
@@ -117,7 +117,7 @@ function touchAction(e) {
 
         fretTouches.forEach(t => {
             const x = t.clientX/W
-            const y = 1 - t.screenY/h
+            const y = t.clientY/H
     
             const keyNumber = holdNote(x,y)
             presses.add(keyNumber)

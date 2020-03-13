@@ -60,7 +60,6 @@ class NuniGraphNode extends GraphNode {
     constructor(parent, type, connectionType, options={}){
         super(parent)
         const { doConnect, yAxisFactor, values={} } = options
-        this.volume = 0.5
         this.hasNuniParent = parent instanceof NuniGraphNode
         this.type = type
         this.connectionType = connectionType
@@ -146,7 +145,7 @@ class BaseGraph {
         this.root = new NuniGraphNode(adsr, nodetypes.GAIN, 'channel')
         this.adsr = adsr
         this.nodes = [this.root]
-        this.volume = 0.5
+        this.volume = 0.5 / nGraphs
         this.selectedNode = null
     }
 

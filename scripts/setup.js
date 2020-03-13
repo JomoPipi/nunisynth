@@ -7,10 +7,7 @@
 
 
 
-
-
-
-
+const log = console.log
 
 
 function showErr(e) {
@@ -22,9 +19,6 @@ function showErr(e) {
 function debug(...x) {
     D('debug').innerHTML = x.join`<br>`
 }
-const log = console.log
-
-
 
 
 
@@ -38,10 +32,6 @@ const D = x => document.getElementById(x)
 
 // web audio API declaration
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-
-// const masterGain = audioCtx.createGain()
-//     masterGain.gain.setValueAtTime(0.5, 0)
-//     masterGain.connect(audioCtx.destination)
 
 const nGraphs = 3
 
@@ -58,22 +48,8 @@ const masterGains = [...Array(nGraphs)].map(_ => {
     return gain
 })
 
-const ADSR = [0.05, .04, .145, .06]
+const ADSR = [0.08, .04, .145, .06]
     
-// var masterEnvelope;
-// try{
-//     masterEnvelope = ADSRNode(audioCtx, {
-//         attack: 0.1,
-//         decay: 0.2,
-//         sustain: 0.6,
-//         release: 0.3
-//     })
-//        masterEnvelope.connect(masterGain.gain)
-//        masterEnvelope.start()
-// } catch(e) {
-//     document.body.innerHTML = 'we have an error:<br>' + e
-// }
-
 
 // spec says 24000, but I can only hear up to 17k.
 const OSCILLATOR_MAX_FREQUENCY = 17000
@@ -98,6 +74,8 @@ function toNodeValue(sliderValue) {
 
 
 
+const logo = new Image()
+    logo.src = 'logo.png'
 
 // add title screen -- sound wont start without initial user gesture.
 function startScreenSetup({func: f, text: t}) {
@@ -110,11 +88,12 @@ function startScreenSetup({func: f, text: t}) {
     S.width = '100%'
     S.height = '100%'
     S.zIndex = '99'
-    S.backgroundColor = 'orange'
+    S.backgroundColor = '#bebebe'
     S.textAlign = 'center'
     S.alignItems = 'center'
     S.fontSize = '300%'
     startScreen.innerHTML = t
+    startScreen.appendChild(logo)
     document.body.append(startScreen)
     startScreen.onmousedown = function() {
         this.style.display = 'none'

@@ -6,13 +6,14 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=0.5,
-    maximum-scale=0.5, maximum-scale=0.5, user-scalable=0">
+
+    <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=0.5, maximum-scale=0.5, user-scalable=0">
+    
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
     <link rel="stylesheet" href="styles.scss">
 
-    <title>Mobile Synth</title>
+    <title> Nuni Synth v0 </title>
 
 </head>
 
@@ -24,7 +25,7 @@
 
 
 
-    <span id="debug" style="position: absolute; top:0; left: 0; z-index:999;">  DEBUG </span>
+    <!-- <span id="debug" style="position: absolute; top:0; left: 0; z-index:999;">  DEBUG </span> -->
 
 
 
@@ -34,8 +35,8 @@
 
 
         <!-- MASTER VOLUME -->
-        <input type="range" id="vol-slider" min=0 max=0.125 step=0.0001 value=0.125 
-            oninput="setMasterVolume(+this.value/4)">
+        <input type="range" id="vol-slider" min=0 max=1 step=0.0001 value=1 
+            oninput="setMasterVolume(+this.value/nGraphs)">
 
 
         <!-- THE GRAPH ITSELF  -->
@@ -129,6 +130,21 @@
             <option value="chromatic">  chromatic   </option>
         </select>
 
+        rows
+        <select id="keyboard-rows" name="keyboardrows" value = 2
+            oninput="
+                KB.rows = +this.value
+                KB.update()
+            ">
+            <option value="1">      1       </option>
+            <option value="2">      2       </option>
+            <option value="3">      3       </option>
+            <option value="4">      4       </option>
+            <option value="5">      5       </option>
+            <option value="6">      6       </option>
+            <option value="7">      7       </option>
+        </select>
+
         <br> 
         
         <!-- CHOOSE NOTES PER OCTAVE (IF MODE == CONTINUOUS) -->
@@ -160,26 +176,34 @@
         ">
 
         <!-- ADSR -->
-        <br> attack
-        <input type="range" class="slider"
-        min=0 max=1 step=0.00001 value=0
-        oninput="ADSR[0] = +this.value">
-        
-        <br> decay
-        <input type="range" class="slider"
-        min=0 max=1 step=0.00001 value=0
-        oninput="ADSR[1] = +this.value">
+        <div class="adsr-type">
+            attack
+            <input type="range" class="slider"
+            min=0 max=1 step=0.00001 value=0
+            oninput="ADSR[0] = (+this.value)**2">
+        </div>
 
-        <br> sustain
-        <input type="range" class="slider"
-        min=0 max=0.5 step=0.00001 value=0 
-        oninput="ADSR[2] = +this.value">
-        
-        <br> release
-        <input type="range" class="slider"
-        min=0 max=2 step=0.00001 value=0
-        oninput="ADSR[3] = +this.value">
+        <div class="adsr-type">
+            decay
+            <input type="range" class="slider"
+            min=0 max=1 step=0.00001 value=0
+            oninput="ADSR[1] = (+this.value)**2">
+        </div>
 
+        <div class="adsr-type">
+            sustain
+            <input type="range" class="slider"
+            min=0 max=1 step=0.00001 value=0 
+            oninput="ADSR[2] = (+this.value)**2">
+        </div>
+
+        <div class="adsr-type">
+            release
+            <input type="range" class="slider"
+            min=0 max=2 step=0.00001 value=0
+            oninput="ADSR[3] = (+this.value)**2">
+        </div>
+        
     </div>
 
 
@@ -200,9 +224,9 @@
     <!-- NAVIGATE THROUGH PAGES  -->
     <select id="page-select" name="pageselect"
     oninput=" showPage(D(this.value + '-page')) ">
-        <option value="graph">          Graph           </option>
-        <option value="keyboard">       Keyboard        </option>
+        <option value="keyboard">       Keyboard          </option>
         <option value="settings">       Keyboard Settings </option>
+        <option value="graph">          Audio Graph       </option>
     </select>
 
 </body>

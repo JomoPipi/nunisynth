@@ -13,7 +13,7 @@ function showPage(page) {
     
     // turn off sound on the keyboard page unless you actually play notes
     if (page.id === 'keyboard-page') {
-        masterGain.disconnect()
+        masterGain.gain.setValueAtTime(0,audioCtx.currentTime)
         graphs.length = 0
         for (let i = 0; i < nGraphs; i++) {
             const adsr = audioCtx.createGain()
@@ -33,8 +33,7 @@ function showPage(page) {
             KB.keyConnectsTo[i] = null
         }
 
-        masterGain.connect(audioCtx.destination)
-        G.root.audioNode.connect(masterGain)
+        masterGain.gain.setValueAtTime(G.volume, audioCtx.currentTime)
 
         // reset all the node's values
         G.nodes.forEach(node => {

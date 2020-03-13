@@ -5,6 +5,42 @@ const preset = G => {
     
     return {
         0: _ => {
+            ;[...Array(2)].reduce((a,_,n) =>
+                a.addChild('filter', 'channel',
+                {
+                    values: { frequency: 300 + 3 ** (4 + (n*3)/TAU), frequency_yAxisFactor: -8 },
+                    doConnect: true
+
+                }), G.root)
+
+            G.root.children.forEach((c,n) =>  {
+                
+                c.addChild('gain', 'frequency',
+                {
+                    values: { gain: 300 * (n+1),  gain_yAxisFactor: 8 },
+                })
+
+                c.children[0]
+                    .addChild('oscillator', 'channel',
+                    {
+                        values: { frequency: 3 ** n, frequency_yAxisFactor: PHI },
+                        doConnect: true,
+
+                    })
+
+
+                
+                c.addChild('oscillator', 'channel',
+                {
+                    values: { frequency: 2 ** (8 + n * 3 /PHI) },
+                    doConnect: true
+                })
+            })
+            G.root.gain.yAxisFactor = 0.9
+            G.update()
+            // debug,('g=',G.nodes.length)
+        },
+        1: _ => {
             ;[...Array(5)].reduce((a,_,n) =>
                 a.addChild('oscillator', 'channel',
                 {
@@ -25,12 +61,12 @@ const preset = G => {
                     doConnect: true,
                 })
             })
-            G.root.gain.yAxisFactor = PHI
+            G.root.gain.yAxisFactor = 0.25
             G.update()
-            debug('g=',G.nodes.length)
+            // debug('g=',G.nodes.length)
         },
 
-        1: _ => {
+        2: _ => {
             ;[...Array(4)].reduce((a,_,n,arr) =>
                 a.addChild('filter', 'channel',
                 {
@@ -61,10 +97,10 @@ const preset = G => {
             })
             G.root.gain.yAxisFactor = PHI
             G.update()
-            debug('g=',G.nodes.length)
+            // debug('g=',G.nodes.length)
         },
         
-        2: _ => {
+        3: _ => {
             ;[...Array(4)].reduce((a,_,n,arr) =>
                 a.addChild('filter', 'channel',
                 {
@@ -111,14 +147,15 @@ const preset = G => {
             })
             G.root.gain.yAxisFactor = PHI
             G.update()
-            debug('g=',G.nodes.length)
+            // debug('g=',G.nodes.length)
         },
     }
 }
 
-[0,1,2].forEach(n => {
+;[0,1,2,3].forEach(n => {
     const btn = E('button')
-    btn.innerHTML = 'preset: ' + n
+    btn.innerHTML = 'preset ' + n
+    btn.classList.add('neumorph')
     btn.onclick = _ => {
         confirm('Your graph will be erased') &&
             preset(G)[n]()
