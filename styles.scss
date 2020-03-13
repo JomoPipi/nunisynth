@@ -52,12 +52,12 @@
 #graph-page {
   background-image: url('bgpic.png');
   display: none;
+  display: block;
 }
 
 #keyboard-page {
   width: 100%;
   height: 100%;
-  display: block;
 }
 
 #page-select {

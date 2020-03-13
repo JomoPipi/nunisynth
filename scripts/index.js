@@ -15,6 +15,7 @@ var W = KB.canvas.width = G.canvas.width = window.innerWidth
 startScreenSetup({
     func: _ => {
         preset(G)[0]()
+        showPage(D('keyboard-page'))
     },
     text: 'NuniSynth <br><br><br><br> version 0.1'
 })
