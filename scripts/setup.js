@@ -47,9 +47,16 @@ const masterGains = [...Array(nGraphs)].map(_ => {
     gain.connect(audioCtx.destination)
     return gain
 })
-
-const ADSR = [0.08, .04, .145, .06]
     
+MY_JS_DIALS.forEach(dial => {
+    dial.value = ADSR[dial.id.split`-`[1]]
+    dial.render()
+    dial.attach(x => {
+
+        ADSR[dial.id.split`-`[1]] = x * x
+        ADSR.render()
+    })
+})
 
 // spec says 24000, but I can only hear up to 17k.
 const OSCILLATOR_MAX_FREQUENCY = 17000

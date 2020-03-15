@@ -23,7 +23,11 @@
 * :focus {
   outline: none;
 }
-
+.tr-corner {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
 #node-edit-page {
   // pointer-events: none;
   padding: 7%;
@@ -37,6 +41,21 @@
   border: 2px solid gray;
   box-sizing: border-box;
   display: none;
+}
+#kb-and-sidepanel {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 60% 40%;
+}
+
+#fretboard {
+  display: inline;
+}
+
+#side-panel { 
+  display: none;
+  margin: 0% 7%;
 }
 
 .selected {
@@ -60,11 +79,14 @@
   height: 100%;
 }
 
-#page-select {
+.page-swapper {
+  background-color: black;
+  color:white;
+  font-size: 2em;
   position: absolute;
-  top: 0;
-  width: 160px;
-  height: 50px;
+  bottom: 0;
+  width: fit-content;
+  height: fit-content;
   right: 0;
   z-index: 99;
 }
@@ -106,9 +128,7 @@
 .height100 {
   height: 100%;
 }
-select {
-  height: 90px;
-}
+
 #mappings-page {
   display: 'none';
   height: auto;
@@ -134,9 +154,6 @@ select {
 //       -12px -12px 12px 0 rgba(255,255,255,1),
 //       12px 12px 12px 0 rgba(0,0,0,0.1)
 // }
-
-
-
 
 
 
@@ -186,10 +203,10 @@ select {
     box-shadow: 1px 1px 1px #000000;
     height: 50px;
     width: 80px;
+    margin-top: -20px;
     border-radius: 1em;
     cursor: pointer;
     -webkit-appearance: none;
-    margin-top: -20px;
     border: 1px solid #51005f53;
     background: rgba(218, 212, 236, 0.952);
   }
@@ -207,8 +224,9 @@ select {
   }
   input[type=range]::-moz-range-thumb {
     box-shadow: 1px 1px 1px #000000;
-    height: 30px;
-    width: 15px;
+    height: 50px;
+    width: 80px;
+    margin-top: -20px;
     border-radius: 1em;
     border: 1px solid #51005f53;
     background: rgba(218, 212, 236, 0.952);
@@ -237,8 +255,9 @@ select {
   input[type=range]::-ms-thumb {
     margin-top: 1px;
     box-shadow: 1px 1px 1px #000000;
-    height: 30px;
-    width: 15px;
+    height: 50px;
+    width: 80px;
+    margin-top: -20px;
     border-radius: 1em;
     border: 1px solid #51005f53;
     background: rgba(218, 212, 236, 0.952);
@@ -276,4 +295,11 @@ select {
   cursor: pointer;
   -webkit-appearance: none;
   margin-top: -10px;
+}
+
+.js-dial {
+  width: 21.5%; // 7% margin on the div it's inside of
+}
+#adsr-visual {
+  width: 75%;
 }

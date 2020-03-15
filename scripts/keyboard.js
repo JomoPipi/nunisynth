@@ -19,16 +19,17 @@ class Keyboard {
     constructor(canvas) {
         this.canvas = canvas
         this.ctx = canvas.getContext('2d')
+        this.wDiv = this.hDiv = 1
         this.octaves = this.rows = 3
         this.kbMode = 'scale',
-        this.surplus = 1.025,
+        this.panelOpen = 0
+        this.panelWidth = .4
         this.NRT2 = TR2,
         this.notesPerOctave = 12
         this.divisionLinePercent = 1 // 0.65
-        this.wDiv = 1
-        this.hDiv = 1
         this.divisionLine = canvas.height * 0.65
         this.keyConnectsTo = {}
+        this.lastRequestID = null
     }
     
 
@@ -82,12 +83,14 @@ class Keyboard {
 
 
 
-    update() {
+    update() { 
+        const W = this.canvas.width  = window.innerWidth  * this.wDiv
+        const H = this.canvas.height = window.innerHeight * this.hDiv
         
+
         if (this.kbMode === 'scale') this.notesPerOctave = 7
 
         const range = this.octaves
-        const k = this.divisionLine = this.divisionLinePercent * H
         const n = this.notesPerOctave
         const keys = n * range
         
@@ -133,31 +136,53 @@ class Keyboard {
                 
             }
         })
+    }
 
-
-
-
-        // for (let i = 0, count = 0; i <= range; i++) {
-
-        //     const dx = (1/range) * W
-        //     const [a,b] = [i * dx,(i+1) * dx]
-            
-        //     for (let j = 0; j < n; j++) {
     
-        //         this.keyConnectsTo[count++] = null
-        //         const gradient = this.ctx.createLinearGradient(a,0,a,k)
-                
-        //         for (let z = 0; z > -12; z--)
-        //             gradient.addColorStop( PHI ** z, keycolor[j][Math.abs(z) % 3])
+    toggleSidePanel() {
+        const open = (this.panelOpen ^= 1)
+        const paint = _ => {
+            const desiredWDiv = 1 - this.panelWidth * open
+            const delta = (desiredWDiv - this.wDiv) / 4
+            log(delta,desiredWDiv)
+            if (Math.abs(delta) < 1e-4)
+                this.wDiv = desiredWDiv
+            else 
+                this.wDiv += delta
 
-        //         this.ctx.fillStyle = gradient
-        //         this.ctx.beginPath()
-        //         this.ctx.rect(a + dx*j/n, 0, dx, k)
-        //         this.ctx.fill()
-        //         this.ctx.stroke()
-        //         this.ctx.closePath()
-        //     }
-        // }
+
+            if (this.wDiv !== desiredWDiv) {
+                window.cancelAnimationFrame(this.lastRequestID)
+                this.lastRequestID = requestAnimationFrame(paint)
+            }
+            this.update()
+            D('side-panel').style.display = open ? 'inline' : 'none'
+        }
+        paint()
+    }
+
+    
+    processCoordinateArray(coords, noteOn, noteOff) {
+        const W = this.canvas.width
+        const H = this.canvas.height
+        const presses = new Set()
+        
+        coords.forEach(t => {
+            const x = t.clientX/W
+            const y = t.clientY/H
+
+            const keyNumber = noteOn(x,y)
+            presses.add(keyNumber)
+        })
+        
+        for (const i in this.keyConnectsTo) {
+            if (!presses.has(+i)) {
+                if (this.keyConnectsTo[i]) {
+                    
+                    noteOff(this.keyConnectsTo[i])
+                }
+                this.keyConnectsTo[i] = null
+            }
+        }
     }
 }
-

@@ -15,9 +15,6 @@ const createNode = {
     [nodetypes.FILTER]: 'createBiquadFilter'
 }
 
-// osc -- 2 sliders
-// gain -- 1 slider
-// filter 3 - 4 sliders
 const numericalControlProperties = {
     [nodetypes.OSC]:    ['frequency','detune'],
     [nodetypes.GAIN]:   ['gain'],
@@ -31,14 +28,13 @@ const defaultPropertyValues = {
     Q: 1
 }
 
-// this will tell use how a node is connected to it's parent
 const setDestination = type => {
     return type === 'channel' ? x => x : x => x[type]
 }
 
-const markTypeConnection = {
 
-}
+
+
 const NuniGraph = (_ => {
 
 
@@ -170,7 +166,7 @@ class NuniGraph extends BaseGraph {
         this.animate = animate
         this.animationSpeed = 40
         this.depth = 1
-        this.nodeRadius = 40;
+        this.nodeRadius = 40
     }
 
 
@@ -210,6 +206,8 @@ class NuniGraph extends BaseGraph {
 
 
     setCoordinates() {
+        const W = this.canvas.width  = window.innerWidth
+        const H = this.canvas.height = window.innerHeight
         const children = [this.root]
         let currentDepth = 0
         this.nodes = []
@@ -242,6 +240,9 @@ class NuniGraph extends BaseGraph {
 
 
     paint() {
+        const W = this.canvas.width
+        const H = this.canvas.height
+        
         this.ctx.clearRect(0,0,W,H)
         const children = [this.root]
         let isComplete = true
