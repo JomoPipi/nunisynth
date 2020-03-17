@@ -13,14 +13,16 @@ const MY_JS_DIALS = (_ => {
             }
         })(dial.attributes)
     
-        this.attach = func => {
+        this.attach = (func,startFunc,endFunc) => {
     
             const start = y => { 
                 this.lastY = y
                 this.isActive = true
+                startFunc()
             }
             const end = _ => { 
                 this.isActive = false
+                endFunc()
             }
             const touchStart = e => start(e.touches[0].clientY)
             const mouseStart = e => start(e.clientY)

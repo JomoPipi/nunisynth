@@ -6,7 +6,6 @@
 
 
 
-
 const log = console.log
 
 
@@ -55,6 +54,12 @@ MY_JS_DIALS.forEach(dial => {
 
         ADSR[dial.id.split`-`[1]] = x * x
         ADSR.render()
+    },
+    _ => {
+        D('adsr-visual').style.height = '120'
+    },
+    _ => {
+        D('adsr-visual').style.height = 0
     })
 })
 
@@ -81,29 +86,19 @@ function toNodeValue(sliderValue) {
 
 
 
-const logo = new Image()
-    logo.src = 'logo.png'
 
 // add title screen -- sound wont start without initial user gesture.
 function startScreenSetup({func: f, text: t}) {
     const startScreen = document.createElement('div')
-    const S = startScreen.style
-    S.position = 'absolute'
-    S.display = 'flex'
-    S.top = '0px'
-    S.left = '0px'
-    S.width = '100%'
-    S.height = '100%'
-    S.zIndex = '99'
-    S.backgroundColor = '#bebebe'
-    S.textAlign = 'center'
-    S.alignItems = 'center'
-    S.fontSize = '300%'
+    startScreen.classList.add('start-screen')
     startScreen.innerHTML = t
-    startScreen.appendChild(logo)
     document.body.append(startScreen)
     startScreen.onmousedown = function() {
         this.style.display = 'none'
+        this.style.backgroundColor = 'lightcyan'
+        this.wasTouched = true
+        window.resizeHandler()
         if (f) f()
     }
+    return startScreen
 }

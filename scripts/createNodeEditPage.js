@@ -2,7 +2,7 @@ const propertyChildrenTypes = {
     frequency: [nodetypes.GAIN],
     detune: [nodetypes.GAIN],
     gain: [nodetypes.OSC, nodetypes.GAIN, nodetypes.FILTER],
-    Q:  [nodetypes.OSC, nodetypes.GAIN, nodetypes.FILTER]
+    Q: [nodetypes.OSC, nodetypes.GAIN, nodetypes.FILTER]
 }
 
 const isSourceNode = {

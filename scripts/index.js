@@ -4,42 +4,32 @@
 
 const G = new NuniGraph(masterGain, D('nuni-graph'), { animate: true })
 
-const KB = new Keyboard(D('fretboard'))
+const KB = new Keyboard(D('keyboard'))
 
 const graphs = []
 
 const lowVol = 1e-2
 
-startScreenSetup({
+const FORCE_LANDSCAPE = startScreenSetup({
     func: _ => {
         preset(G)[0]()
         showPage(D('keyboard-page'))
         KB.update()
         G.update()
     },
-    text: 'NuniSynth <br><br><br><br> version 0.1'
-})
-
-function noteOff(adsr) {
+    text: `
+    <p style='position:absolute;top:0;font-size:0.5em'>
+        use your mobile device in landscape mode
+    </p>
     
-    const { release } = ADSR
-    const t = audioCtx.currentTime
-    adsr.gain.cancelScheduledValues(t)
-    adsr.gain.setValueAtTime(adsr.gain.value, t)
-    adsr.gain.setTargetAtTime(0, t, release)
-
-    const stop = setInterval(() => {
-        if (adsr.gain.value < lowVol) {
-            adsr.gain.cancelScheduledValues(t)
-            adsr.gain.setValueAtTime(adsr.gain.value, t)
-            adsr.gain.setTargetAtTime(0, t, release)
-            const i = graphs.findIndex(g => g.adsr === adsr)
-            const g = graphs.splice(i,1)[0]
-            graphs.unshift(g)
-            clearInterval(stop)
-        }
-    }, 10);
-}
+    <span style='position:absolute;bottom:5%;font-size:1em'>
+        Nuni 
+        <p>
+            version 0.1
+        </p>
+    </span>
+`
+})
 
 function noteOn(x,y) {
     const [pitchFactor, vertFactor, keynum] = KB.getFrequencyFactorsAndKeyNumber(x,y)
@@ -84,7 +74,26 @@ function noteOn(x,y) {
     return keynum
 }
 
+function noteOff(adsr) {
+    
+    const { release } = ADSR
+    const t = audioCtx.currentTime
+    adsr.gain.cancelScheduledValues(t)
+    adsr.gain.setValueAtTime(adsr.gain.value, t)
+    adsr.gain.setTargetAtTime(0, t, release)
 
+    const stop = setInterval(() => {
+        if (adsr.gain.value < lowVol) {
+            adsr.gain.cancelScheduledValues(t)
+            adsr.gain.setValueAtTime(adsr.gain.value, t)
+            adsr.gain.setTargetAtTime(0, t, release)
+            const i = graphs.findIndex(g => g.adsr === adsr)
+            const g = graphs.splice(i,1)[0]
+            graphs.unshift(g)
+            clearInterval(stop)
+        }
+    }, 10);
+}
 
 
 KB.canvas.addEventListener('touchstart', touch)

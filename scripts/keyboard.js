@@ -13,7 +13,15 @@ const scaleSteps = [...Array(12)].reduce(a =>
     [2,2,1,2,2,2,1].reduce((b,v) => b.concat(v+b[b.length-1]), a)
 , [0])
 
+const modeSteps = [...Array(7)].map((_,i) => 
+    [...Array(12)].reduce(a => 
+        ((xs => [...xs.slice(i), ...xs.slice(0,i)] ) ([2,2,1,2,2,2,1]))
+        .reduce((b,v) => b.concat(v+b[b.length-1]), a)
+    , [0])
 
+)
+
+const magicOffset = .86
 
 class Keyboard {
     constructor(canvas) {
@@ -21,7 +29,7 @@ class Keyboard {
         this.ctx = canvas.getContext('2d')
         this.wDiv = this.hDiv = 1
         this.octaves = this.rows = 3
-        this.kbMode = 'scale',
+        this.kbMode = 'major',
         this.panelOpen = 0
         this.panelWidth = .4
         this.NRT2 = TR2,
@@ -30,6 +38,7 @@ class Keyboard {
         this.divisionLine = canvas.height * 0.65
         this.keyConnectsTo = {}
         this.lastRequestID = null
+        this.modeShift = 0
     }
     
 
@@ -44,18 +53,6 @@ class Keyboard {
     }
 
     
-    _getFrequencyFactorAndKeyNumber(x) {
-        const keyNumber = x * this.notesPerOctave * this.octaves | 0
-        return [
-            this.kbMode === 'chromatic' ?
-
-                this.NRT2 ** keyNumber :
-
-                TR2 ** scaleSteps[keyNumber]
-            
-            , keyNumber]
-    }
-
     
     getFrequencyFactorsAndKeyNumber(x,y) {
         const row =  y * this.rows | 0
@@ -72,7 +69,7 @@ class Keyboard {
 
                 this.NRT2 ** keyNumber :
 
-                TR2 ** scaleSteps[keyNumber]
+                TR2 **  modeSteps[this.modeShift][keyNumber]
             
             , 
             vertFactor,
@@ -84,11 +81,27 @@ class Keyboard {
 
 
     update() { 
-        const W = this.canvas.width  = window.innerWidth  * this.wDiv
-        const H = this.canvas.height = window.innerHeight * this.hDiv
+        const canvas = this.canvas
+        canvas.style.width = (100 * this.wDiv * magicOffset) + '%'
         
+        canvas.width  = canvas.offsetWidth * this.wDiv * magicOffset// because of the two 7% wood panels
+        canvas.height = canvas.offsetHeight
+        
+        const W = canvas.width
+        const H = canvas.height
 
-        if (this.kbMode === 'scale') this.notesPerOctave = 7
+        const notChromatic = this.kbMode !== 'chromatic'
+
+        if (notChromatic)
+        {   // update: modes, and this is the easiest way to handle them
+
+            this.modeShift = 'major,dorian,phrygian,lydian,mixolydian,minor,locrian'.split`,`.indexOf(this.kbMode)
+        }
+
+
+
+
+        if (notChromatic) this.notesPerOctave = 7
 
         const range = this.octaves
         const n = this.notesPerOctave
@@ -106,8 +119,10 @@ class Keyboard {
                 ')')
         })
 
-        this.ctx.strokeStyle = 'white'
-        this.ctx.lineWidth = 25 / (n * range)
+        this.ctx.strokeStyle = 'black'
+        this.ctx.lineWidth = 8//25 / (n * range)
+
+        const margin = 2
 
         const rowHeight = H /this.rows
         
@@ -129,9 +144,8 @@ class Keyboard {
 
                 this.ctx.fillStyle = gradient
                 this.ctx.beginPath()
-                this.ctx.rect(x, y, keyWidth, rowHeight)
+                this.ctx.rect(x + margin, y + margin, keyWidth - 2*margin, rowHeight - 2*margin)
                 this.ctx.fill()
-                this.ctx.stroke()
                 this.ctx.closePath()
                 
             }
@@ -140,24 +154,34 @@ class Keyboard {
 
     
     toggleSidePanel() {
+        const sidepanel = D('side-panel')
         const open = (this.panelOpen ^= 1)
         const paint = _ => {
             const desiredWDiv = 1 - this.panelWidth * open
-            const delta = (desiredWDiv - this.wDiv) / 4
-            log(delta,desiredWDiv)
+            const dx = Math.abs(desiredWDiv - this.wDiv)
+            const dir = desiredWDiv > this.wDiv ? 1 : -1
+            const delta = Math.min(dx, 0.05) * dir
+            
             if (Math.abs(delta) < 1e-4)
                 this.wDiv = desiredWDiv
             else 
                 this.wDiv += delta
 
 
-            if (this.wDiv !== desiredWDiv) {
+            if (this.wDiv !== desiredWDiv) 
+            {
                 window.cancelAnimationFrame(this.lastRequestID)
                 this.lastRequestID = requestAnimationFrame(paint)
             }
+            else if (open) {
+                sidepanel.style.display = 'block'
+            }
+            
             this.update()
-            D('side-panel').style.display = open ? 'inline' : 'none'
         }
+        if (!open)
+            sidepanel.style.display = 'none'
+
         paint()
     }
 

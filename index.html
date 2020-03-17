@@ -10,9 +10,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=0.5, maximum-scale=0.5, user-scalable=0">
     
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
-    <link rel="stylesheet" href="styles.scss">
-
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.scss"><link href="https://fonts.googleapis.com/css?family=Baloo+Chettan+2&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Baloo+Chettan+2&display=swap" rel="stylesheet">
+    
     <title> Nuni Synth v0 </title>
 
 </head>
@@ -26,8 +27,6 @@
 
 
     <!-- <span id="debug" style="position: absolute; top:0; left: 0; z-index:999;">  DEBUG </span> -->
-
-
 
 
     <!-- GRAPH PAGE -->
@@ -98,28 +97,22 @@
 
     <!-- THE KEYBOARD  -->
     <div id="keyboard-page" class='page'>
-        <button id="open-panel"class='page-swapper' onclick="KB.toggleSidePanel()">
+        
+        <button id="open-panel" class='neumorph page-swapper' onclick="KB.toggleSidePanel()">
             &lt;&lt;&lt;
         </button>
+
         <div id="kb-and-sidepanel">
-            <canvas id="fretboard"></canvas>
+
+            <div class="wood-element-0"></div>
+
+            <canvas id="keyboard"></canvas>
+                
+            <div class="wood-element-0"></div>
+
 
             <div id="side-panel">
-                
-                rows
-                <select id="keyboard-rows" name="keyboardrows" value=3
-                    oninput="
-                        KB.rows = +this.value
-                        KB.update()
-                    ">
-                    <option value="3">      3       </option>
-                    <option value="1">      1       </option>
-                    <option value="2">      2       </option>
-                    <option value="4">      4       </option>
-                    <option value="5">      5       </option>
-                    <option value="6">      6       </option>
-                    <option value="7">      7       </option>
-                </select>
+
 
                 <button class='neumorph tr-corner' onclick="
                     showPage(D('graph-page'))
@@ -128,20 +121,28 @@
                 <br> 
                         
                 <!-- CHOOSE KEYBOARD MODE  -->
-                <label for="keyboardmode"> tone </label>
+                <!-- <label for="keyboardmode"> tone </label> -->
                 <select id="keyboard-mode" name="keyboardmode"
                     oninput="
                         KB.kbMode = this.value
                         D('notes-per-octave-box').style.display = this.value === 'chromatic' ? 'inline' : 'none'
                         KB.update()
                     ">
-                    <option value="scale">      scale       </option>
-                    <option value="chromatic">  chromatic   </option>
+                    <!-- <option value="scale">      scale       </option> -->
+                    <option value="major">      Major       </option>
+                    <option value="dorian">     Dorian      </option>
+                    <option value="phrygian">   Phrygian    </option>
+                    <option value="lydian">     Lydian      </option>
+                    <option value="mixolydian"> Mixolydian  </option>
+                    <option value="minor">      Minor       </option>
+                    <option value="locrian">    Locrian     </option>
+                    <option value="chromatic">  Microtonal  </option>
                 </select> 
 
                 
                 <!-- CHOOSE NOTES PER OCTAVE (IF MODE == CONTINUOUS) -->
                 <span id="notes-per-octave-box" style='display:none'>
+                    <br>
                     <label for="npo" class="text0"> tones per octave </label>
                     <span id="notes-per-octave-text" class="text0"> 12 </span> <br>
                     <input type="range" id="notes-per-octave" class="slider"
@@ -162,31 +163,35 @@
                 <input type="range" name="pitchrange" id="pitch-range" class="slider"
                 min=1 max=7 step=1 value=3
                 oninput="
-                    KB.octaves = D('pitch-range-text').innerHTML = this.value
+                    KB.rows = KB.octaves = D('pitch-range-text').innerHTML = +this.value
                     KB.update()
                 ">
                 
                 <br>
 
                 <!-- ADSR -->
-                ADSR
-                <br>
-                <canvas id="adsr-attack" class="js-dial" width=50 height=50>
-                </canvas>
+                <div id="adsr-box" class="neumorph">
 
-                <canvas id="adsr-decay" class="js-dial" width=50 height=50>
-                </canvas>
-
-                <canvas id="adsr-sustain" class="js-dial" width=50 height=50>
-                </canvas>
-
-                <canvas id="adsr-release" class="js-dial" width=50 height=50>
-                </canvas>
-
-                <br>
-                <canvas id="adsr-visual"></canvas>
-
+                    ADSR
+                    <br>
+                    <canvas id="adsr-attack" class="js-dial" width=50 height=50>
+                    </canvas>
+    
+                    <canvas id="adsr-decay" class="js-dial" width=50 height=50>
+                    </canvas>
+    
+                    <canvas id="adsr-sustain" class="js-dial" width=50 height=50>
+                    </canvas>
+    
+                    <canvas id="adsr-release" class="js-dial" width=50 height=50>
+                    </canvas>
+    
+                    <br>
+                    <canvas id="adsr-visual"></canvas>
+    
+                </div>
             </div>
+
         </div>
 
 
