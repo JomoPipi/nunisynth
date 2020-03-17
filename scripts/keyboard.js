@@ -154,7 +154,7 @@ class Keyboard {
 
     
     toggleSidePanel() {
-        const sidepanel = D('side-panel')
+        const sidepanel = D('side-panel-container')
         const open = (this.panelOpen ^= 1)
         const paint = _ => {
             const desiredWDiv = 1 - this.panelWidth * open
@@ -174,7 +174,7 @@ class Keyboard {
                 this.lastRequestID = requestAnimationFrame(paint)
             }
             else if (open) {
-                sidepanel.style.display = 'block'
+                sidepanel.style.display = 'inline-block'
             }
             
             this.update()

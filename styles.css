@@ -75,7 +75,6 @@
   right: 0;
 }
 #node-edit-page {
-  // pointer-events: none;
   padding: 7%;
   background-color: rgba(202, 255, 241, 0.90);
   position: absolute;
@@ -97,7 +96,7 @@
   width: 100%;
   height: 100%;
   background-color: #ddd;
-  // display: flex;
+  font-size: 0;
 }
 .wood-element-0 {
   display: inline-block;
@@ -109,17 +108,27 @@
 #keyboard {
   display: inline-block;
   background: var(--grad3);
-  // background-image: url('wood.jpg');
-  // background-size: 7% 110%;
   width: 100%;
   height: 100%;
-  // padding: 0% 7%;
-  // box-sizing: border-box;
 }
 
-#side-panel { 
+#side-panel-container { 
   display: none;
-  margin: 0% 7%;
+  font-size: 30;
+  width: 34%;
+  height: 100vh;
+  vertical-align: top;
+}
+
+.side-panel-content {
+  width: 100%;
+  display: inline-flex;
+  flex-direction: column; 
+  align-items: center;
+}
+
+.controls {
+  width: 80%;
 }
 
 
@@ -169,8 +178,6 @@
 
 .node-properties {
   display: grid;
-  // grid-template-columns: auto;
-  // grid-template-rows: auto;
 }
 .column {
   text-align: center;
