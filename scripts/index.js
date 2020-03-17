@@ -30,7 +30,6 @@ const FORCE_LANDSCAPE = startScreenSetup({
     </span>
 `
 })
-
 function noteOn(x,y) {
     const [pitchFactor, vertFactor, keynum] = KB.getFrequencyFactorsAndKeyNumber(x,y)
     const newlyHeld = KB.keyConnectsTo[keynum] == null
@@ -69,6 +68,9 @@ function noteOn(x,y) {
         adsr.gain.cancelScheduledValues(t)
         adsr.gain.setTargetAtTime(G.volume, t, attack)
         adsr.gain.setTargetAtTime(sustain ** 2, t1, decay)
+
+        const [red,green,blue] = [0,0,0].map((_,i) => 150 + (Math.sin(i+keynum/PHI)*105)|0)
+        KB.canvas.style.backgroundColor = `rgb(${red},${green},${blue})`
     }
 
     return keynum
@@ -101,6 +103,7 @@ KB.canvas.addEventListener('touchmove',  touch)
 KB.canvas.addEventListener('touchend',   touch)
 
 function touch(e) {
+    if (!e.touches.length) KB.canvas.style.backgroundColor = '#333'
     return KB.processCoordinateArray(
         [...e.touches].slice(0,nGraphs),
         noteOn,

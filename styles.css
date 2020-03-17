@@ -14,15 +14,15 @@
   --grad2: linear-gradient(
     0deg, 
     rgba(100,100,255,0.2440650406504066) 0%, 
-    rgba(100,100,255,0.7707317073170732) 50%, 
-    rgba(100,100,255,0.975609756097561) 100%);
+    rgba(0, 242, 255, 0.771) 50%, 
+    rgb(215, 192, 250) 100%);
 
     
   --grad3: linear-gradient(
     180deg, 
-    rgb(43, 16, 104) 0%,
-    rgb(153, 253, 255) 50%, 
-    rgb(43, 16, 104) 100%);
+    rgb(0, 0, 0) 0%, 
+    rgba(0, 229, 255, 0.319) 50%,
+    rgb(104, 104, 104) 100%);
 }
 
 
@@ -103,13 +103,27 @@
   background-image: url('wood.jpg');
   width: 7%;
   height: 100%;
-  background-size: 100% 110%;
+  background-position: right;
+  background-size: 200% 100%;
+}
+.wood-element-1 {
+  display: inline-block;
+  background-image: url('wood.jpg');
+  width: 7%;
+  height: 100%;
+
+  /* the following is a fix to a random ass ios border  */
+  margin-left: -1px;
+  padding-left: 1px;
+
+  background-size: 150% 100%;
 }
 #keyboard {
   display: inline-block;
-  background: var(--grad3);
+  transition: background-color 0.3s ease-out;
   width: 100%;
   height: 100%;
+  background-color: #333;
 }
 
 #side-panel-container { 
@@ -128,7 +142,7 @@
 }
 
 .controls {
-  width: 80%;
+  width: 90%;
 }
 
 
@@ -213,8 +227,6 @@ select {
   -webkit-padding-end: 20px;
   -webkit-padding-start: 2px;
   -webkit-user-select: none;
-  // background-image: url('wood.jpg'), 
-  //   -webkit-linear-gradient(#FAFAFA, #F4F4F4 40%, #E5E5E5);
   background-position: center right;
   background-repeat: no-repeat;
   color: rgb(73, 91, 97);
@@ -365,5 +377,5 @@ select {
 }
 
 .js-dial {
-  width: 21.5%; // 7% margin on the div it's inside of
+  width: 21.5%;
 }

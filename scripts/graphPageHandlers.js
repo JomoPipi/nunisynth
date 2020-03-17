@@ -63,27 +63,6 @@ function handleGraphTouch(e) {
             }
         }
 
-        //     case nodetypes.OSC:
-        //         D('osc-type').value = touched.audioNode.type
-        //         D('osc-frequency-value').value = touched.frequency.value
-        //         D('osc-frequency-slider').value = toSliderValue(touched.frequency.value)
-        //         D('connect-osc-to-kb-btn')
-        //             .classList[touched.connectedToKeyboard ? 'add' : 'remove']('selected')
-
-        //         break
-
-        //     case nodetypes.GAIN:
-        //         D('gain-value').value = touched.gain.value
-        //         D('gain-slider').value = toSliderValue(touched.gain.value)
-
-        //         break
-
-        //     case nodetypes.FILTER:
-        //         D('filter-type').value = touched.audioNode.type
-
-        //         break
-        // }
-
         D('oscillator-only-box').style.display = touched.type === 'oscillator' ? 'grid' : 'none'
         D('gain-only-box').style.display = touched.type === 'gain' ?             'grid' : 'none'
         D('filter-only-box').style.display = touched.type === 'filter' ?         'grid' : 'none'

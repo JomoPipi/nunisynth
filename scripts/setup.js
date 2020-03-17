@@ -51,12 +51,11 @@ MY_JS_DIALS.forEach(dial => {
     dial.value = ADSR[dial.id.split`-`[1]]
     dial.render()
     dial.attach(x => {
-
         ADSR[dial.id.split`-`[1]] = x * x
         ADSR.render()
     },
     _ => {
-        D('adsr-visual').style.height = '120'
+        D('adsr-visual').style.height = '150'
     },
     _ => {
         D('adsr-visual').style.height = 0
