@@ -98,38 +98,46 @@
   background-color: #ddd;
   font-size: 0;
 }
-.wood-element-0 {
+.wood-element {
   display: inline-block;
   background-image: url('wood.jpg');
   width: 7%;
   height: 100%;
+  overflow: hidden;
+}
+.left-wood-element {
   background-position: right;
   background-size: 200% 100%;
 }
-.wood-element-1 {
-  display: inline-block;
-  background-image: url('wood.jpg');
-  width: 7%;
-  height: 100%;
+.right-wood-element {
+  background-size: 200% 100%;
+  background-position: right;
+  background-size: 150% 100%;
 
-  /* the following is a fix to a random ass ios border  */
+  /* gets rid of weird gap in ios  */
   margin-left: -1px;
   padding-left: 1px;
-
-  background-size: 150% 100%;
 }
 #keyboard {
   display: inline-block;
   transition: background-color 0.3s ease-out;
   width: 100%;
   height: 100%;
-  background-color: #333;
+  background-color: #272727;
+  transition: width 1s;
 }
 
 #side-panel-container { 
+  position: absolute;
+  background-color: #333;
+  /* background-image: url('wood.jpg'); */
+  /* filter: brightness(50%); */
+  width: 0px;
+  transition: width 1s;
+  right: 0;
+  background-size: 100% 100%;
   display: none;
   font-size: 30;
-  width: 34%;
   height: 100vh;
   vertical-align: top;
 }
@@ -152,9 +160,6 @@
   background: rgba(0, 255, 96, 0.09);
 }
 
-.adsr-type {
-  display: inline-block;
-}
 #adsr-visual {
   width: 100%;
   transition: height 0.2s;
@@ -170,17 +175,6 @@
   height: 100%;
 }
 
-.page-swapper {
-  background-color: black;
-  color:white;
-  font-size: 2em;
-  position: absolute;
-  bottom: 0;
-  width: fit-content;
-  height: fit-content;
-  right: 0;
-  z-index: 99;
-}
 
 .page{
   display:none;
@@ -229,7 +223,7 @@ select {
   -webkit-user-select: none;
   background-position: center right;
   background-repeat: no-repeat;
-  color: rgb(73, 91, 97);
+  color: rgb(139, 158, 165);
   font-size: 1.5em;
   margin: 0;
   overflow: hidden;
@@ -258,11 +252,26 @@ select {
   padding: 5px;
   border-radius: .5em;
   box-shadow:
-    -12px -12px 12px 0 rgba(255,255,255,0.1),
-    12px 12px 12px 0 rgba(0,0,0,0.03);
+    -12px -12px 12px 0 rgba(255,255,255,0.02),
+    12px 12px 12px 0 rgba(0,0,0,0.1);
   font-family: monospace;
   color: rgb(160, 160, 160);
   cursor: pointer;
+}
+
+
+
+.toggle-sidepanel {
+  font-size: 2em;
+  width: 7vw;
+  height: fit-content;
+  margin-top: 85vh;
+  right: 0;
+  z-index: 99;
+  color: rgba(150,150,150,0.3);
+  box-shadow:
+    -12px -12px 12px 0 rgba(255, 255, 255, 0.025),
+    12px 12px 12px 0 rgba(0,0,0,0.15);
 }
 
   input[type=range] {
@@ -376,6 +385,34 @@ select {
   margin-top: -10px;
 }
 
+#adsr-box {
+  width: 100%;
+}
+.shadow-knob {
+  display: inline-block;
+
+  width: 80px;
+  height: 80px;
+
+  border-radius: 100%;
+  background-image: url('shadow-knob.png');
+  background-size: 100% 100%;
+}
+
 .js-dial {
-  width: 21.5%;
+  position: absolute;
+  display: inline-block;
+  border: 0px groove #eee;
+  box-sizing: border-box;
+  width: 80px;
+  height: 80px;
+
+  border-radius: 100%;
+  
+  background-image: url('knob.png');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: .7;
+
+  transform: none;
 }

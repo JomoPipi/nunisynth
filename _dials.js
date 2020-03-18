@@ -49,10 +49,35 @@ const MY_JS_DIALS = (_ => {
             window.addEventListener('mouseup', end)
             window.addEventListener('touchend', end)
         }
-        
-        const imgDegreeOffset = 195
+    
+        const ctx = dial.getContext('2d')
+        const N = Math.min(dial.width,dial.height)
+        const radius =  N/2
+        const pi2 = Math.PI / 2.0
+        const z = 10.0
+        const piN = Math.PI / z
+        const arcRange = value => {
+            return 2 * ((z-1)/z) * Math.PI * (value - this.min) / (this.max - this.min)
+        }
+
         this.render = _ => {
-            dial.style.transform = `rotate(${this.value * 330 + imgDegreeOffset}deg)`
+            ctx.fillStyle = '#AAB'
+            ctx.strokeStyle = 'blue'
+            ctx.lineWidth = 5
+
+            ctx.clearRect(0,0,N,N)
+
+            ctx.beginPath()
+            ctx.arc(N/2, N/2, radius, 0, 7)
+            ctx.fill()
+            
+            const pos = arcRange(this.value) + pi2 + piN
+            
+            ctx.beginPath()
+            ctx.arc(N/2, N/2, radius, pos, pos, true)
+            ctx.lineTo(N/2, N/2)
+            ctx.stroke()
+            ctx.closePath()
         }
         this.render()
     }

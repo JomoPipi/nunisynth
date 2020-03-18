@@ -146,7 +146,7 @@ class Keyboard {
                         .map(x => x + row*10)
                     return 'rgba(' +
                     [R * 1.85 + 40, G * 1.85 + 40, (B + 25)*1.3].join`,` + 
-                    ',0.9)'
+                    ',0.8)'
                 })
             })
 
@@ -174,35 +174,26 @@ class Keyboard {
 
     
     toggleSidePanel() {
-        clearInterval(this.spLastRequestID)
+        clearTimeout(this.closeRequestId)
         const sidepanel = D('side-panel-container')
+
         const open = (this.panelOpen ^= 1)
+        D('open-panel').innerHTML = open ? '>>' : '<<'
+
+        if (open)
+            sidepanel.style.display = 'inline-block'
+        sidepanel.style.width = open ? this.panelWidth * .86 * window.innerWidth : 0
+
         const paint = _ => {
             const desiredWDiv = 1 - this.panelWidth * open
-            const dx = Math.abs(desiredWDiv - this.wDiv)
-            const dir = desiredWDiv > this.wDiv ? 1 : -1
-            const delta = Math.min(dx, 0.05) * dir
-            
-            if (Math.abs(delta) < 1e-4)
-                this.wDiv = desiredWDiv
-            else 
-                this.wDiv += delta
-
-
-            if (this.wDiv !== desiredWDiv) 
-            {
-                window.cancelAnimationFrame(this.lastRequestID)
-                this.lastRequestID = requestAnimationFrame(paint)
-            }
-            else if (open) {
-                sidepanel.style.display = 'inline-block'
-            }
-            
+            this.wDiv = desiredWDiv
             this.update()
         }
-        if (!open)
-            sidepanel.style.display = 'none'
-
+        if (!open) {
+            this.closeRequestId = setTimeout(_ => {
+                sidepanel.style.display = 'none'
+            }, 1000)
+        }
         paint()
     }
 

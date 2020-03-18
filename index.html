@@ -98,17 +98,20 @@
     <!-- THE KEYBOARD  -->
     <div id="keyboard-page" class='page'>
         
-        <button id="open-panel" class='neumorph page-swapper' onclick="KB.toggleSidePanel()">
-            &lt;&lt;&lt;
-        </button>
 
         <div id="kb-and-sidepanel">
 
-            <div class="wood-element-0"></div>
+            <div class="wood-element left-wood-element"></div>
 
             <canvas id="keyboard"></canvas>
                 
-            <div class="wood-element-1"></div>
+            <div class="wood-element right-wood-element">
+
+                <button id="open-panel" class='neumorph toggle-sidepanel' onclick="KB.toggleSidePanel()">
+                    &lt;&lt;
+                </button>
+                
+            </div>
 
 
             <div id="side-panel-container">
@@ -173,23 +176,34 @@
                         <div id="adsr-box" class="neumorph">
 
                             ADSR
+
                             <br>
-                            <canvas id="adsr-attack" class="js-dial" width=50 height=50>
-                            </canvas>
-            
-                            <canvas id="adsr-decay" class="js-dial" width=50 height=50>
-                            </canvas>
-            
-                            <canvas id="adsr-sustain" class="js-dial" width=50 height=50>
-                            </canvas>
-            
-                            <canvas id="adsr-release" class="js-dial" width=50 height=50>
-                            </canvas>
-            
+
+                            <span class="shadow-knob">
+                                <div id="adsr-attack" class="js-dial">
+                                </div>
+                            </span>
+
+                            <span class="shadow-knob">
+                                <div id="adsr-decay" class="js-dial">
+                                </div>
+                            </span>
+
+                            <span class="shadow-knob">
+                                <div id="adsr-sustain" class="js-dial">
+                                </div>
+                            </span>
+
+                            <span class="shadow-knob">
+                                <div id="adsr-release" class="js-dial">
+                                </div>
+                            </span>
+                            
                             <br>
+
                             <canvas id="adsr-visual"></canvas>
             
-                        </div>
+                        </span>
                     </div>
                 </div>
             </div>
