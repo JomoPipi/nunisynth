@@ -149,6 +149,23 @@ const preset = G => {
             G.update()
             // debug('g=',G.nodes.length)
         },
+        4: _ => {
+            G.root.addChild('oscillator','channel',{
+                values: { frequency: 40, frequency_auxAdsrVal: 4 },
+                doConnect: true
+            })
+
+            aux_ADSR.attack = 0.013129376702863738
+            aux_ADSR.decay = 0.04486140259274407
+            ADSR.attack = 0.010416984558105469
+            ADSR.decay = 0.17708349227905273
+            ADSR.sustain = 0.8233901420913412
+            ADSR.release = 0.1601858678519443
+
+
+            G.root.gain.yAxisFactor = PHI
+            G.update()
+        }
     }
 }
 

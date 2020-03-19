@@ -72,6 +72,7 @@ class NuniGraphNode extends GraphNode {
 
             // it may come pre-set
             this[prop].yAxisFactor = values[prop + '_yAxisFactor'] || 0
+            this[prop].auxAdsrVal = values[prop + '_auxAdsrVal']
         }
         
         const location = setDestination(connectionType)(this.hasNuniParent ? parent.audioNode : parent)
@@ -107,6 +108,7 @@ class NuniGraphNode extends GraphNode {
         , {})
         for (const prop of numericalControlProperties[root.type]) {
             values[prop + '_yAxisFactor'] = root[prop].yAxisFactor || 0
+            values[prop + '_auxAdsrVal'] = root[prop].auxAdsrVal
         }
         const settings = {
             doConnect: root.connectedToKeyboard,
@@ -180,6 +182,7 @@ class NuniGraph extends BaseGraph {
         G.root.yAxisFactor = this.root.yAxisFactor
         for (const prop of numericalControlProperties[this.root.type]) {
             G.root[prop].yAxisFactor = this.root[prop].yAxisFactor || 0
+            G.root[prop].auxAdsrVal = this.root[prop].auxAdsrVal
         }
         
         for (const kid of this.root.children.slice())

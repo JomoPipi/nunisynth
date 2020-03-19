@@ -53,8 +53,27 @@ function noteOn(x,y) {
             
             const value = node[prop].value * freqA * freqB
 
+            const aux_val = node[prop].auxAdsrVal
+
+            const property = node.audioNode[prop]
+            
             // add ADSR to these sometime?
-            node.audioNode[prop].setValueAtTime(value|| 0, 0)
+            if (aux_val && newlyHeld) {
+                
+                const { attack, decay } = aux_ADSR
+                
+                const t = audioCtx.currentTime
+                const t1 = t + attack
+
+                property.cancelScheduledValues(t)
+                property.setTargetAtTime(aux_val * value, t, attack)
+                property.setTargetAtTime(value, t1, decay)
+            }
+            else
+            {
+                property.setValueAtTime(value|| 0, 0)
+            }
+
         }
     })
 

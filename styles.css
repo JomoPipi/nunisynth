@@ -386,6 +386,7 @@ button {
 .selectable {
 
     /* no select */
+    border: 1px solid blue;
     -webkit-touch-callout: all; /* iOS Safari */
     -webkit-user-select: all; /* Safari */
     -khtml-user-select: all; /* Konqueror HTML */
