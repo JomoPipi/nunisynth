@@ -33,13 +33,13 @@
     <div id="graph-page" class='page'>
 
         <!-- GOTO KEYBOARD PAGE  -->
-        <button class='neumorph tr-corner' onclick="
+        <button class='neumorph2 tr-corner' onclick="
             showPage(D('keyboard-page'))
         "> keyboard </button>
 
         <!-- MASTER VOLUME -->
-        <input type="range" id="vol-slider" min=0 max=1 step=0.0001 value=1 
-            oninput="setMasterVolume(+this.value/nGraphs)">
+        <!-- <input type="range" id="vol-slider" min=0 max=1 step=0.0001 value=1 
+            oninput="setMasterVolume(+this.value/nGraphs)"> -->
 
 
         <!-- THE GRAPH ITSELF  -->
@@ -49,8 +49,8 @@
         <!-- NODE EDIT PAGE  -->
         <div id="node-edit-page">
 
-            <button class="neumorph"
-                onclick="leaveNodeEditPage()"> back &lt;= </button> <br> <br>
+            <button class="neumorph2"
+                onclick="leaveNodeEditPage()"> back &lt;= </button>
 
             <!-- NODE TYPE AND ID  -->
             <span id="node-edit-page-text"> This message shouldn't be here by the time the page loads. </span> 
@@ -60,11 +60,15 @@
                 <!-- SEE "createNodeEditPage.js"  -->
             </div>
 
-            <div id="mappings-page" style="display: none;" class="neumorph">
+            <div id="mappings-page" style="display: none;" class="neumorph2">
                 <div id="mapping-type-text"></div>
+
                 <span> y-axis connection with keyboard: </span>
                 <span id="y-axis-factor-text"></span>
-                <input type="range" id="y-axis-factor" class="neumorph" min=-9 max=9 value=0 step=0.125>
+                <input type="range" id="y-axis-factor" class="neumorph2" min=-9 max=9 value=0 step=0.25>
+            
+                <span> starting-value (aux-ADSR): </span>
+                <input type="number" id="aux-adsr-val" class="neumorph2">
             </div>
 
 
@@ -75,8 +79,6 @@
         </div>
         <!-- END NODE EDIT PAGE -->
 
-        <!-- PRESETS  -->
-        <div id="presets"></div>
     </div>
     <!-- END GRAPH PAGE  -->
 
@@ -105,51 +107,81 @@
 
             <canvas id="keyboard"></canvas>
                 
-            <div class="wood-element right-wood-element">
+            <div class="wood-element right-wood-element" onclick="KB.toggleSidePanel()">
 
-                <button id="open-panel" class='neumorph toggle-sidepanel' onclick="KB.toggleSidePanel()">
+                <!-- <button id="open-panel" class='neumorph toggle-sidepanel' onclick="KB.toggleSidePanel()">
                     &lt;&lt;
-                </button>
+                </button> -->
                 
             </div>
 
 
             <div id="side-panel-container">
                 <div class="side-panel-content">
-                    <div class="controls">
-                        <button class='neumorph tr-corner' onclick="
-                            showPage(D('graph-page'))
-                        "> advanced </button>
 
-                        <br> 
+
+
+
+                    <div id="main-controls" class="controls">
+                        <!-- <button class='neumorph tr-corner' onclick="
+                            showPage(D('graph-page'))
+                        "> advanced </button> -->
+
+                        <div id="tone-container">
+
+
+                            <!-- CHOOSE ROOT NOTE  -->
+                            <select id="keyboard-mode" class="neumorph"
+                                oninput="
+                                    KB.pitchShift = +(this.value.split`-`[1])
+                                    D('notes-per-octave-box').style.display = this.value === 'chromatic' ? 'inline' : 'none'
+                                    KB.update()
+                                ">
+                                <option value="shift-0">      C       </option>
+                                <option value="shift-1">      C#       </option>
+                                <option value="shift-2">      D       </option>
+                                <option value="shift-3">      D#       </option>
+                                <option value="shift-4">      E       </option>
+                                <option value="shift-5">      F       </option>
+                                <option value="shift-6">      F#       </option>
+                                <option value="shift-7">      G       </option>
+                                <option value="shift-8">      G#       </option>
+                                <option value="shift-9">      A       </option>
+                                <option value="shift-10">     A#       </option>
+                                <option value="shift-11">     B       </option>
+                                <option value="shift-12">     C       </option>
+                            </select>
+
+
+
                                 
-                        <!-- CHOOSE KEYBOARD MODE  -->
-                        <!-- <label for="keyboardmode"> tone </label> -->
-                        <select id="keyboard-mode" name="keyboardmode"
-                            oninput="
-                                KB.kbMode = this.value
-                                D('notes-per-octave-box').style.display = this.value === 'chromatic' ? 'inline' : 'none'
-                                KB.update()
-                            ">
-                            <!-- <option value="scale">      scale       </option> -->
-                            <option value="dorian">     Dorian      </option>
-                            <option value="major">      Major       </option>
-                            <option value="phrygian">   Phrygian    </option>
-                            <option value="lydian">     Lydian      </option>
-                            <option value="mixolydian"> Mixolydian  </option>
-                            <option value="minor">      Minor       </option>
-                            <option value="locrian">    Locrian     </option>
-                            <option value="chromatic">  Microtonal  </option>
-                        </select> 
+                            <!-- CHOOSE KEYBOARD MODE  -->
+                            <select id="keyboard-mode" name="keyboardmode" class="neumorph"
+                                oninput="
+                                    KB.kbMode = this.value
+                                    D('notes-per-octave-box').style.display = this.value === 'chromatic' ? 'inline' : 'none'
+                                    KB.update()
+                                ">
+                                <option value="major">      Major       </option>
+                                <option value="dorian">     Dorian      </option>
+                                <option value="phrygian">   Phrygian    </option>
+                                <option value="lydian">     Lydian      </option>
+                                <option value="mixolydian"> Mixolydian  </option>
+                                <option value="minor">      Minor       </option>
+                                <option value="locrian">    Locrian     </option>
+                                <option value="chromatic">  Microtonal  </option>
+                            </select> 
+
+                        </div>
 
                         
                         <!-- CHOOSE NOTES PER OCTAVE (IF MODE == CONTINUOUS) -->
                         <span id="notes-per-octave-box" style='display:none'>
                             <br>
                             <label for="npo" class="text0"> tones per octave </label>
-                            <span id="notes-per-octave-text" class="text0"> 12 </span> <br>
+                            <span id="notes-per-octave-text" class="text0"> 7 </span> <br>
                             <input type="range" id="notes-per-octave" class="slider"
-                            min=1 max=24 step=1 value=12 name='npo'
+                            min=1 max=24 step=1 value=7 name='npo'
                             oninput="
                                 KB.notesPerOctave = +this.value
                                 KB.NRT2 = 2 ** (1 / (+this.value))
@@ -162,20 +194,75 @@
 
                         <!-- CHOOSE NUMBER OF OCTAVES -->
                         <label for="pitchrange" class="text0"> octaves </label>
-                        <span id="pitch-range-text" class="text0"> 3 </span> <br>
-                        <input type="range" name="pitchrange" id="pitch-range" class="slider"
-                        min=1 max=7 step=1 value=3
-                        oninput="
-                            KB.rows = KB.octaves = D('pitch-range-text').innerHTML = +this.value
+                        <span id="pitch-range-text" class="text0"> 3 </span>
+                        <button class="neumorph circle"
+                        onclick="
+                            KB.rows = Math.max(KB.rows-1,1)
+                            KB.octaves = D('pitch-range-text').innerHTML = KB.rows
                             KB.update()
-                        ">
+                        "> - </button>
+
+                        <button class="neumorph circle"
+                        onclick="
+                            KB.rows = Math.min(KB.rows+1,7)
+                            KB.octaves = D('pitch-range-text').innerHTML = KB.rows
+                            KB.update()
+                        "> + </button>
                         
-                        <br>
 
+                        <div id="voice-container" class="neumorph">
+                            <!-- CHOOSE PRESET  -->
+                            <select  class="voice-select" style="font-size:1.7em"
+                            oninput="
+                                disconnectShadowGraphs()
+                                preset(G)[this.value]()
+                                connectShadowGraphs()
+                            ">
+                                <option value="0"> belly_bells </option>
+                                <option value="1"> phi organ </option>
+                            </select> 
+
+                            <!-- ENTER ADVANCED CONTROLS  -->
+                            <button class="edit-voice"
+                                onclick="
+                                    D('main-controls').style.display='none'
+                                    D('advanced-controls').style.display='inline-block'
+                                "
+                            > • • • </button>
+
+                        </div>
+
+                        <div>
+                            <br> <br> <br>
+                            coming soon - sequencer
+                        </div>
+
+
+                    </div>
+                    <!-- END MAIN CONTROLS  -->
+
+
+                    
+                    <div id="advanced-controls">
+
+
+                        <button class="neumorph" 
+                            onclick="
+                            D('advanced-controls').style.display='none'
+                            D('main-controls').style.display='inline-block'
+                            "> BACK </button>
+
+                        
+                        <button class="neumorph tr-corner" style="color:var(--secondary)" 
+                            onclick="
+                                showPage(D('graph-page'))
+                            "> DEEP EDIT </button>
+
+                        
                         <!-- ADSR -->
-                        <div id="adsr-box" class="neumorph">
+                        <div id="adsr-box">
 
-                            ADSR
+                            <span class="text0"> GAIN ADSR </span> 
 
                             <br>
 
@@ -202,9 +289,45 @@
                             <br>
 
                             <canvas id="adsr-visual"></canvas>
-            
-                        </span>
+
+                            <br>
+
+                            <span class="text0"> AUX ADSR </span> 
+
+                            <br>
+
+                            <span class="shadow-knob">
+                                <div id="aux-adsr-attack" class="js-dial">
+                                </div>
+                            </span>
+
+                            <span class="shadow-knob">
+                                <div id="aux-adsr-decay" class="js-dial">
+                                </div>
+                            </span>
+
+                            <span class="shadow-knob">
+                                <div id="aux-adsr-sustain" class="js-dial">
+                                </div>
+                            </span>
+
+                            <span class="shadow-knob">
+                                <div id="aux-adsr-release" class="js-dial">
+                                </div>
+                            </span>
+                            
+                            <br>
+
+                            <canvas id="aux-adsr-visual"></canvas>
+                        </div>
+
+                        
+
+
                     </div>
+                    <!-- END ADVANCED CONTROLS  -->
+
+
                 </div>
             </div>
         </div>

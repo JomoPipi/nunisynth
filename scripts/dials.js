@@ -15,25 +15,27 @@ const MY_JS_DIALS = (_ => {
     
         this.attach = (func,startFunc,endFunc) => {
     
-            const start = y => { 
+            const start = (x,y) => { 
+                this.lastX = x
                 this.lastY = y
                 this.isActive = true
-                startFunc()
+                startFunc && startFunc()
             }
             const end = _ => { 
                 this.isActive = false
-                endFunc()
+                endFunc && endFunc()
             }
-            const touchStart = e => start(e.touches[0].clientY)
-            const mouseStart = e => start(e.clientY)
-            const touchMove = e => move(e.touches[0].clientY)
-            const mouseMove = e => move(e.clientY)
+            const touchStart = e => start(e.touches[0].clientX,e.touches[0].clientY)
+            const mouseStart = e => start(e.clientX,e.clientY)
+            const touchMove = e => move(e.touches[0].clientX,e.touches[0].clientY)
+            const mouseMove = e => move(e.clientX,e.clientY)
             
-            const move = y => {
+            const move = (x,y) => {
                 if (!this.isActive) return;
     
-                this.value += (this.lastY - y) * this.sensitivity
+                this.value += (this.lastY - y + x - this.lastX) * this.sensitivity
                 this.value = Math.max(this.min, Math.min(this.max, this.value))
+                this.lastX = x
                 this.lastY = y
     
                 this.render()
@@ -52,7 +54,7 @@ const MY_JS_DIALS = (_ => {
         
         const imgDegreeOffset = 195
         this.render = _ => {
-            dial.style.transform = `rotate(${this.value * 330 + imgDegreeOffset}deg)`
+            dial.style.transform = `rotate(${this.value * 320 + imgDegreeOffset}deg)`
         }
         this.render()
     }

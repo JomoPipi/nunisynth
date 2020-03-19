@@ -42,16 +42,15 @@ class Keyboard {
         this.ctx = canvas.getContext('2d')
         this.wDiv = this.hDiv = 1
         this.octaves = this.rows = 3
-        this.kbMode = 'dorian',
+        this.kbMode = 'major',
         this.panelOpen = 0
         this.panelWidth = .4
         this.NRT2 = TR2,
         this.notesPerOctave = 12
-        this.divisionLinePercent = 1 // 0.65
-        this.divisionLine = canvas.height * 0.65
         this.keyConnectsTo = {}
         this.lastRequestID = null
         this.modeShift = 0
+        this.pitchShift = 0
     }
     
 
@@ -78,13 +77,13 @@ class Keyboard {
         const vertFactor = this.rows * (y % (1.0 / this.rows)) 
 
         return [
-            this.kbMode === 'chromatic' ?
+            TR2 ** this.pitchShift * (
+                this.kbMode === 'chromatic' ?
 
-                this.NRT2 ** keyNumber :
+                    this.NRT2 ** keyNumber :
 
-                TR2 **  modeSteps[this.modeShift][keyNumber]
-            
-            , 
+                    TR2 **  modeSteps[this.modeShift][keyNumber]
+                ), 
             vertFactor,
             keyNumber
         ]
@@ -139,10 +138,16 @@ class Keyboard {
 
             
             const keycolor = [...Array(n)].map((_,i) => {
-                
+                const shift = notChromatic ? 
+                    this.modeShift === 6 ? PHI : this.modeShift : -2.5
+
                 return [0,1,2].map(m => {
                     const [R,G,B] = 
-                        [0,1,2].map(q => 50 + row*10 + 10 * (1 + Math.sin(twoThirdsPi * ((q+m)/m) + (i/n) * TAU)) |0)
+                        [0,1,2].map(q => 
+                            50 + 
+                            row * 10 + 
+                            20 * ( 1 + Math.sin(twoThirdsPi * ((q+m+shift)/m) + (i/n) * TAU) )
+                        |0)
                         .map(x => x + row*10)
                     return 'rgba(' +
                     [R * 1.85 + 40, G * 1.85 + 40, (B + 25)*1.3].join`,` + 
@@ -176,9 +181,8 @@ class Keyboard {
     toggleSidePanel() {
         clearTimeout(this.closeRequestId)
         const sidepanel = D('side-panel-container')
-
         const open = (this.panelOpen ^= 1)
-        D('open-panel').innerHTML = open ? '>>' : '<<'
+        // D('open-panel').innerHTML = open ? '>>' : '<<'
 
         if (open)
             sidepanel.style.display = 'inline-block'
@@ -192,7 +196,7 @@ class Keyboard {
         if (!open) {
             this.closeRequestId = setTimeout(_ => {
                 sidepanel.style.display = 'none'
-            }, 1000)
+            }, 200)
         }
         paint()
     }

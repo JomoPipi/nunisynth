@@ -30,7 +30,7 @@ for (const type of Object.values(nodetypes)) {
 
     const _E = x => {
         const e = document.createElement(x)
-        e.classList.add('neumorph')
+        e.classList.add('neumorph2')
         return e
     }
 
@@ -117,6 +117,9 @@ for (const type of Object.values(nodetypes)) {
     }
 
     if (!isSourceNode[type]) {
+        const box2 = _E('div')
+        box2.style.display='grid'
+        box2.style.gridTemplateColumns = '1fr 1fr 1fr'
         for (const _type of Object.values(nodetypes)) {
 
             const channelButton = _E('button')
@@ -126,8 +129,9 @@ for (const type of Object.values(nodetypes)) {
                 G.update()
             }
 
-            box.appendChild(channelButton)
+            box2.appendChild(channelButton)
         }
+        box.appendChild(box2)
     } else {
         const connectBtn = _E('button')
         connectBtn.id = `${type}-kb-connect`
@@ -152,6 +156,7 @@ function toggleMappingsPage(prop) {
     typetext.innerHTML = title
     if (differs || p.style.display === 'none') {
         p.style.display = 'block'
+
         const slider = D('y-axis-factor')
         text.innerHTML = 
         slider.value = G.selectedNode[prop].yAxisFactor || 0 
@@ -159,6 +164,13 @@ function toggleMappingsPage(prop) {
             text.innerHTML = 
             G.selectedNode[prop].yAxisFactor = +this.value
         }
+
+        const auxval = D('aux-adsr-val')
+        auxval.value = G.selectedNode[prop].auxAdsrVal
+        auxval.oninput = function() {
+            G.selectedNode[prop].auxAdsrVal = +this.value
+        }
+
     } else {
         p.style.display = 'none'
     }

@@ -152,13 +152,13 @@ const preset = G => {
     }
 }
 
-;[0,1,2,3].forEach(n => {
-    const btn = E('button')
-    btn.innerHTML = 'preset ' + n
-    btn.classList.add('neumorph')
-    btn.onclick = _ => {
-        confirm('Your graph will be erased') &&
-            preset(G)[n]()
-    }
-    D('presets').appendChild(btn)
-})
+// ;[0,1,2,3].forEach(n => {
+//     const btn = E('button')
+//     btn.innerHTML = 'preset ' + n
+//     btn.classList.add('neumorph')
+//     btn.onclick = _ => {
+//         confirm('Your graph will be erased') &&
+//             preset(G)[n]()
+//     }
+//     D('presets').appendChild(btn)
+// })
