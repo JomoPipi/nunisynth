@@ -7,14 +7,19 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=0.5, maximum-scale=0.5, user-scalable=0">
+    <meta name="viewport" content="width=device-width, initial-scale=0.5, minimum-scale=0.5, maximum-scale=0.5, user-scalable=0">
     
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="styles.css"><link href="https://fonts.googleapis.com/css?family=Baloo+Chettan+2&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Baloo+Chettan+2&display=swap" rel="stylesheet">
     
-    <title> Nuni Synth v0 </title>
+    <title> 
+
+            Nuni Synth v0 
+
+    </title>
 
 </head>
 
@@ -26,31 +31,45 @@
 
 
 
-    <!-- <span id="debug" style="position: absolute; top:0; left: 0; z-index:999;">  DEBUG </span> -->
+
+
+
+
+    <!-- <span id="debug" style="position: absolute; top:0; left: 0; z-index:99;">  DEBUG </span> -->
+
+
+
+
+
+
 
 
     <!-- GRAPH PAGE -->
     <div id="graph-page" class='page'>
+
 
         <!-- GOTO KEYBOARD PAGE  -->
         <button class='neumorph2 big tr-corner' onclick="
             showPage(D('keyboard-page'))
         "> keyboard </button>
 
-        <!-- MASTER VOLUME -->
-        <!-- <input type="range" id="vol-slider" min=0 max=1 step=0.0001 value=1 
-            oninput="setMasterVolume(+this.value/nGraphs)"> -->
+
+        <!-- MASTER VOLUME  -->
+        <input type="range" id="vol-slider" min=0 max=0.5 step=0.0001 value=1 
+            oninput="setMasterVolume(+this.value/nGraphs)">
 
 
         <!-- THE GRAPH ITSELF  -->
         <canvas id="nuni-graph"></canvas>
         
 
+
+
         <!-- NODE EDIT PAGE  -->
         <div id="node-edit-page">
 
             <button class="neumorph2 big"
-                onclick="leaveNodeEditPage()"> back &lt;= </button>
+                onclick="leaveNodeEditPage()"> back &lt;- </button>
 
             <!-- NODE TYPE AND ID  -->
             <span id="node-edit-page-text"> This message shouldn't be here by the time the page loads. </span> 
@@ -59,46 +78,45 @@
             <button class="tr-corner neumorph2" style="color:rgba(255, 81, 0, 0.817)"
                 onclick="if (confirm('really delete?')) handleDeleteNode()"> delete this node </button> 
 
-            <div id="osc-gain-filter">
-                <!-- SEE "createNodeEditPage.js"  -->
-            </div>
-
-            <div id="mappings-page" style="display: none;" class="neumorph2">
-                <div id="mapping-type-text"></div>
-
-                <div class="mappings-page-grid">
-
-                    <span> y-axis connection with keyboard: </span>
-                    <span id="y-axis-factor-text"></span>
-                    <input type="range" id="y-axis-factor" class="neumorph2 mappings-page-slider" 
-                        min=-9 max=9 value=0 step=0.25>
 
 
-                    <span> AUX-ADSR FACTOR (0 for none): </span>
-                    <span id="aux-adsr-text"></span>
-                    <input type="range" id="aux-adsr-val" class="neumorph2 mappings-page-slider" 
-                        min=-8 max=8 value=0 step=0.25>
-                    <!-- <input type="number" id="aux-adsr-val" class="neumorph2 selectable"> -->
-                
 
+            <!-- BEGIN DYNAMIC CONTENT GENERATED/MANIPULATED WITH createNodeEditPage.js  -->
+
+                <div id="osc-gain-filter"></div>
+
+                <div id="mappings-page" style="display: none;" class="neumorph2">
+                    <div id="mapping-type-text"></div>
+
+                    <div class="mappings-page-grid">
+
+                        <span> y-axis connection with keyboard: </span>
+                        <span id="y-axis-factor-text"></span>
+                        <input type="range" id="y-axis-factor" class="neumorph2 mappings-page-slider" 
+                            min=-9 max=9 value=0 step=0.25>
+
+
+                        <span> AUX-ADSR FACTOR (0 for none): </span>
+                        <span id="aux-adsr-text"></span>
+                        <input type="range" id="aux-adsr-val" class="neumorph2 mappings-page-slider" 
+                            min=-8 max=8 value=0 step=0.25>
+                    
+                    </div>
                 </div>
+
+            <!-- END DYNAMIC CONTENT GENERATED/MANIPULATED WITH createNodeEditPage.js  -->
+
             
-            </div>
 
 
         </div>
         <!-- END NODE EDIT PAGE -->
 
+
+
+
     </div>
     <!-- END GRAPH PAGE  -->
-
-
-
-
-
-
-
-
 
 
 
@@ -137,14 +155,13 @@
                             showPage(D('graph-page'))
                         "> advanced </button> -->
 
-                        <div id="tone-container">
-
+                        <div id="tone-container" class="neumorph">
 
                             <!-- CHOOSE ROOT NOTE  -->
-                            <select id="keyboard-mode" class="neumorph"
+                            <select id="root-note-select"
                                 oninput="
                                     KB.pitchShift = +(this.value.split`-`[1])
-                                    D('notes-per-octave-box').style.display = this.value === 'chromatic' ? 'inline' : 'none'
+                                    D('notes-per-octave-box').style.display = this.value === 'microtonal' ? 'inline' : 'none'
                                     KB.update()
                                 ">
                                 <option value="shift-0">      C       </option>
@@ -163,13 +180,11 @@
                             </select>
 
 
-
-                                
                             <!-- CHOOSE KEYBOARD MODE  -->
-                            <select id="keyboard-mode" name="keyboardmode" class="neumorph"
+                            <select id="keyboard-mode" name="keyboardmode"
                                 oninput="
                                     KB.kbMode = this.value
-                                    D('notes-per-octave-box').style.display = this.value === 'chromatic' ? 'inline' : 'none'
+                                    D('notes-per-octave-box').style.display = this.value === 'microtonal' ? 'inline' : 'none'
                                     KB.update()
                                 ">
                                 <option value="major">      Major       </option>
@@ -179,26 +194,44 @@
                                 <option value="mixolydian"> Mixolydian  </option>
                                 <option value="minor">      Minor       </option>
                                 <option value="locrian">    Locrian     </option>
-                                <option value="chromatic">  Microtonal  </option>
+                                <option value="microtonal"> Microtonal  </option>
                             </select> 
 
+                            <!-- CHOOSE NOTES PER OCTAVE (IF MODE == MICROTONAL) -->
+                            <span id="notes-per-octave-box" style='display:none'>
+                                <select id="notes-per-octave" 
+                                    oninput="
+                                        KB.notesPerOctave = +this.value
+                                        KB.NRT2 = 2 ** (1 / (+this.value))
+                                        KB.update()
+                                    ">
+                                    <option value="1"> 1 </option>
+                                    <option value="2"> 2 </option>
+                                    <option value="3"> 3 </option>
+                                    <option value="4"> 4 </option>
+                                    <option value="5"> 5 </option>
+                                    <option value="6"> 6 </option>
+                                    <option value="7"> 7 </option>
+                                    <option value="8"> 8 </option>
+                                    <option value="9"> 9 </option>
+                                    <option value="10"> 10 </option>
+                                    <option value="11"> 11 </option>
+                                    <option value="12"> 12 </option>
+                                    <option value="13"> 13 </option>
+                                    <option value="14"> 14 </option>
+                                    <option value="15"> 15 </option>
+                                    <option value="16"> 16 </option>
+                                    <option value="17"> 17 </option>
+                                    <option value="18"> 18 </option>
+                                    <option value="19"> 19 </option>
+                                    <option value="20"> 20 </option>
+                                    <option value="21"> 21 </option>
+                                    <option value="22"> 22 </option>
+                                    <option value="23"> 23 </option>
+                                    <option value="24"> 24 </option>
+                                </select>
+                            </span>
                         </div>
-
-                        
-                        <!-- CHOOSE NOTES PER OCTAVE (IF MODE == CONTINUOUS) -->
-                        <span id="notes-per-octave-box" style='display:none'>
-                            <br>
-                            <label for="npo" class="text0"> tones per octave </label>
-                            <span id="notes-per-octave-text" class="text0"> 7 </span> <br>
-                            <input type="range" id="notes-per-octave" class="slider"
-                            min=1 max=24 step=1 value=7 name='npo'
-                            oninput="
-                                KB.notesPerOctave = +this.value
-                                KB.NRT2 = 2 ** (1 / (+this.value))
-                                D('notes-per-octave-text').innerHTML = this.value
-                                KB.update()
-                            ">
-                        </span>
                         
                         <br>
 
@@ -219,6 +252,7 @@
                             KB.update()
                         "> + </button>
                         
+                        <br>
 
                         <div id="voice-container" class="neumorph">
                             <!-- CHOOSE PRESET  -->
@@ -232,6 +266,7 @@
                                 <option value="1"> phi organ </option>
                                 <option value="4"> durty_bass </option>
                                 <option value="5"> techno </option>
+                                <option value="6"> big_trumpet </option>
                             </select> 
 
                             <!-- ENTER ADVANCED CONTROLS  -->
@@ -254,22 +289,44 @@
                     <!-- END MAIN CONTROLS  -->
 
 
-                    
+                    <!-- START ADVANCED CONTROLS  -->
                     <div id="advanced-controls">
 
-
+                        <!-- GO TO THE MAIN CONTROLS PAGE  -->
                         <button class="neumorph" 
                             onclick="
                             D('advanced-controls').style.display='none'
                             D('main-controls').style.display='inline-block'
                             "> BACK </button>
 
-                        
+                        <!-- GO TO THE GRAPH PAGE  -->
                         <button class="neumorph tr-corner" style="color:var(--secondary)" 
                             onclick="
                                 showPage(D('graph-page'))
                             "> DEEP EDIT </button>
 
+                        <br>
+
+                        <div id="detune-box">
+                            <span>
+                                <span class="text0"> detune </span>
+                                <span id="detune-text" class="text0"> 0 </span>
+                            </span>
+                            <input type="range" id="detune-amount" min=-50 value=0 max=50 step=1
+                                oninput="
+                                    KB.detune = D('detune-text').innerHTML = +this.value
+                                    graphs.forEach(G =>
+                                        G.nodes.forEach(node => {
+                                            if (node.type === nodetypes.OSC ||
+                                                node.type === nodetypes.FILTER)
+                                            {
+                                                node.detune = node.audioNode.detune.value = KB.detune
+                                            }
+                                        })
+                                    )
+                                ">
+
+                        </div>
                         
                         <!-- ADSR -->
                         <div id="adsr-box">
@@ -307,8 +364,6 @@
                                 </span>
 
                             </div>
-
-
 
 
                             <div id="aux-adsr">
@@ -349,24 +404,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-    <!-- NAVIGATE THROUGH PAGES  -->
-    <!-- <select id="page-select" class="page-swapper" name="pageselect"
-    oninput=" showPage(D(this.value + '-page')) ">
-        <option value="keyboard">       Keyboard          </option>
-        <option value="settings">       Keyboard Settings </option>
-        <option value="graph">          Audio Graph       </option>
-    </select> -->
 
 </body>
 

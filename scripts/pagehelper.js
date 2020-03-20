@@ -48,7 +48,7 @@ function disconnectShadowGraphs() {
 
     // reset all the node's values
     G.nodes.forEach(node => {
-        for (const prop of numericalControlProperties[node.type]) {
+        for (const prop of audioParamsOfType[node.type]) {
             node.audioNode[prop].setValueAtTime(node[prop].value, 0)
         }
     })

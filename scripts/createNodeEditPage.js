@@ -56,7 +56,8 @@ for (const type of Object.values(nodetypes)) {
         box.appendChild(select)
     }
 
-    for (const prop of numericalControlProperties[type]) {
+    for (const audioParam of audioParamsOfType[type]) {
+
         const div = _E('div')
         div.classList.add('height100')
         const textdiv = E('div')
@@ -65,35 +66,35 @@ for (const type of Object.values(nodetypes)) {
         const slider = _E('input')
         const buttons = _E('div')
 
-        nametext.innerHTML = prop 
+        nametext.innerHTML = audioParam 
 
         valuetext.type = 'number'
         valuetext.classList.add('selectable')
         valuetext.style.width = 150
-        valuetext.id = `${type}-${prop}-value`
+        valuetext.id = `${type}-${audioParam}-value`
         valuetext.oninput = function() {
             const value = +this.value
             slider.value = toSliderValue(value)
-            G.selectedNode.setValueOf(prop, value)
+            G.selectedNode.setValueOf(audioParam, value)
         }
 
         slider.type = 'range'
         slider.min = 0
         slider.max = sliderConstant
         slider.step = 1e-9
-        slider.id = `${type}-${prop}-slider`
+        slider.id = `${type}-${audioParam}-slider`
         slider.oninput = function() {
-            const value = toNodeValue(+this.value) / limitfactor[prop]
+            const value = toNodeValue(+this.value) / limitfactor[audioParam]
             valuetext.value = value
-            G.selectedNode.setValueOf(prop, value)
+            G.selectedNode.setValueOf(audioParam, value)
         }
         
         
-        for (const _type of propertyChildrenTypes[prop]) {
+        for (const _type of propertyChildrenTypes[audioParam]) {
             const addChildBtn = _E('button')
             addChildBtn.innerHTML = '+' + _type
             addChildBtn.onclick = function() {
-                G.selectedNode.addChild(_type, prop)
+                G.selectedNode.addChild(_type, audioParam)
                 G.update()
             }
             buttons.appendChild(addChildBtn)
@@ -101,7 +102,7 @@ for (const type of Object.values(nodetypes)) {
         const mappingsBtn = _E('button')
         mappingsBtn.style.color = '#FBB'
         mappingsBtn.innerHTML = 'MAPS'
-        mappingsBtn.onclick = _ => toggleMappingsPage(prop)
+        mappingsBtn.onclick = _ => toggleMappingsPage(audioParam)
         buttons.appendChild(mappingsBtn)
 
 
@@ -147,12 +148,12 @@ for (const type of Object.values(nodetypes)) {
     D('osc-gain-filter').appendChild(box)
 }
 
-function toggleMappingsPage(prop) {
+function toggleMappingsPage(audioParam) {
     const typetext = D('mapping-type-text')
     const p = D('mappings-page')
     const text = D('y-axis-factor-text')
     const auxtext = D('aux-adsr-text')
-    const title = prop + ' - mappings'
+    const title = audioParam + ' - mappings'
     const differs = title !== typetext.innerHTML
     typetext.innerHTML = title
     if (differs || p.style.display === 'none') {
@@ -160,16 +161,16 @@ function toggleMappingsPage(prop) {
 
         const slider = D('y-axis-factor')
         text.innerHTML = 
-        slider.value = G.selectedNode[prop].yAxisFactor || 0 
+        slider.value = G.selectedNode[audioParam].yAxisFactor || 0 
         slider.oninput = function() {
             text.innerHTML = 
-            G.selectedNode[prop].yAxisFactor = +this.value
+            G.selectedNode[audioParam].yAxisFactor = +this.value
         }
 
         const auxval = D('aux-adsr-val')
-        auxtext.innerHTML = auxval.value = G.selectedNode[prop].auxAdsrVal
+        auxtext.innerHTML = auxval.value = G.selectedNode[audioParam].auxAdsrVal
         auxval.oninput = function() {
-            auxtext.innerHTML = G.selectedNode[prop].auxAdsrVal = +this.value
+            auxtext.innerHTML = G.selectedNode[audioParam].auxAdsrVal = +this.value
         }
 
     } else {

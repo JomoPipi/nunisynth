@@ -103,7 +103,7 @@ html {
   text-align: center;
   align-items: center;
   font-size: 4.9em;
-  background-image: url('logo.png');
+  background-image: url('images/logo.png');
   background-size: fit;
   background-position: center center;
   background-repeat: no-repeat;
@@ -118,7 +118,7 @@ html {
 
 .wood-element {
   display: inline-block;
-  background-image: url('wood.jpg');
+  background-image: url('images/wood.jpg');
   width: 7%;
   height: 100%;
   overflow: hidden;
@@ -133,7 +133,7 @@ html {
 
   background-image:
     linear-gradient(0deg, rgba(8, 0, 255, 0.1), rgba(0, 200, 255, 0.2)),
-    url('wood.jpg');
+    url('images/wood.jpg');
 }
 
 
@@ -165,7 +165,7 @@ html {
       rgba(0, 40, 40, 0.8), 
       rgba(0, 40, 40, 0.8)
     ),
-    url('texture2.jpg'); */
+    url('images/texture2.jpg'); */
   background-size: 100% 100%;
   width: 0;
   right: 0;
@@ -220,6 +220,7 @@ select {
   white-space: nowrap;
   -webkit-appearance: none;
   -moz-appearance: none;
+  color: var(--selectColor);
 }
 button {
   pointer-events: auto;
@@ -243,18 +244,26 @@ button {
   width: 80px;
   height: 80px;
   border-radius: 100%;
-  margin-left: 7%;
+  margin-left: 7px;
   font-size: 1.5em;
 }
 #tone-container {
   display: grid;
-  grid-template-columns: 20% 80%;
+  grid-template-columns: 20% 70% 10%;
+  
+}
+#root-note-select {
+  border: none;
+}
+#keyboard-mode {
+  font-size: 1.5em;
 }
 #voice-container {
   display: grid;
   grid-template-columns: 80% 20%;
   grid-auto-rows: 1fr;
 }
+
 .voice-select {
   margin-right: 0;
   border-top-right-radius: 0;
@@ -273,6 +282,12 @@ button {
 
 /* 61.803398875% 38.196601124999996%; */
 
+#detune-box {
+  display: grid;
+  grid-template-columns: 39% 61%;
+}
+
+
 #adsr-box {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -285,7 +300,7 @@ button {
   height: 80px;
 
   border-radius: 100%;
-  background-image: url('shadow-knob.png');
+  background-image: url('images/shadow-knob.png');
   background-size: 100% 100%;
 }
 
@@ -299,7 +314,7 @@ button {
 
   border-radius: 100%;
   
-  background-image: url('knob.png');
+  background-image: url('images/knob.png');
   background-size: 100% 100%;
   background-repeat: no-repeat;
   opacity: .4;
@@ -318,7 +333,7 @@ button {
 
 
 #graph-page {
-  background-image: url('bgpic.png');
+  background-image: url('images/bgpic.png');
   display: none;
   display: block;
 }
@@ -509,19 +524,15 @@ input[type=range]:focus::-ms-fill-upper {
   transform: rotate(-90deg);
   position: absolute;
   top:  5px;
-  left: 7vw;
-  width: 100px;
-  height: 100px;
-  box-shadow: none;
+  width: 35vh;
+  height: 35vh;
+  margin-left: 50px;
 }  
-#vol-slider::-webkit-slider-thumb {
-  box-shadow: 1px 1px 1px #000000;
-  border: 1px solid #51005f53;
-  background: rgba(77, 70, 93, 0.952);
-  height: 30px;
-  width: 40px;
-  border-radius: 5px;
-  cursor: pointer;
-  -webkit-appearance: none;
-  margin-top: -10px;
-}
+input[type=range]#vol-slider::-webkit-slider-thumb {
+  margin-top: -27px;
+} 
+
+input[type=range]#vol-slider::-webkit-slider-runnable-track {
+  background-color: rgba(129, 188, 189, 0.19);
+  height: 5px;
+}  

@@ -15,10 +15,11 @@ const createNode = {
     [nodetypes.FILTER]: 'createBiquadFilter'
 }
 
-const numericalControlProperties = {
-    [nodetypes.OSC]:    ['frequency','detune'],
+const audioParamsOfType = {
+    // detune is out because KB.detune handles it
+    [nodetypes.OSC]:    ['frequency'], //,'detune'],
     [nodetypes.GAIN]:   ['gain'],
-    [nodetypes.FILTER]: ['frequency','Q','detune'],//nah ,'gain']
+    [nodetypes.FILTER]: ['frequency','Q'], //,'detune','gain']
 }
 
 const defaultPropertyValues = {
@@ -86,7 +87,7 @@ class NuniGraphNode extends GraphNode {
         if (type === nodetypes.OSC) 
             this.audioNode.start()
 
-        for (const prop of numericalControlProperties[type]) {
+        for (const prop of audioParamsOfType[type]) {
 
             this[prop] = {}
 
@@ -138,10 +139,11 @@ class NuniGraphNode extends GraphNode {
 
     addEntireGraph(root) {
 
-        const values = numericalControlProperties[root.type].reduce((a,v) => 
+        const values = audioParamsOfType[root.type].reduce((a,v) => 
             (a[v] = root[v].value, a)
         , {})
-        for (const prop of numericalControlProperties[root.type]) {
+
+        for (const prop of audioParamsOfType[root.type]) {
             values[prop + '_yAxisFactor'] = root[prop].yAxisFactor
             values[prop + '_auxAdsrVal'] = root[prop].auxAdsrVal
         }
@@ -153,6 +155,11 @@ class NuniGraphNode extends GraphNode {
         this.addChild(root.type, root.connectionType, settings)
         const kid = this.children.slice(-1)[0]
         kid.display = root.display
+
+        // copying detune manually since it's not part of nunigraphnode anymore
+        if (root.detune) 
+            kid.detune = kid.audioNode.detune = root.detune
+
         for (const child of root.children) {
             kid.addEntireGraph(child)
         }
@@ -226,7 +233,7 @@ class NuniGraph extends BaseGraph {
         const G = new NuniGraph(adsr, E('canvas'), {})
 
         G.root.gain.value = this.root.gain.value
-        for (const prop of numericalControlProperties[this.root.type]) {
+        for (const prop of audioParamsOfType[this.root.type]) {
             G.root[prop].yAxisFactor = this.root[prop].yAxisFactor
             G.root[prop].auxAdsrVal = this.root[prop].auxAdsrVal
         }
@@ -302,7 +309,7 @@ class NuniGraph extends BaseGraph {
             for (const c of children) {
                 const ctkb = c.connectedToKeyboard
 
-                const prop = numericalControlProperties[c.type][0]
+                const prop = audioParamsOfType[c.type][0]
                 const pValue = c[prop].value
                 const mValue = c[prop].yAxisFactor
 

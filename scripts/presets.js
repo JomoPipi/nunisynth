@@ -214,5 +214,38 @@ const preset = G => {
             aux_ADSR.render()
             G.update()
         },
+        6: _ => {
+            G.root
+            .addChild(nodetypes.FILTER,'channel',{
+                values: { frequency: 173, frequency_yAxisFactor: 0.5 },
+                doConnect: true
+            })
+            .children[0]
+            .addChild(nodetypes.OSC,'channel', {
+                values: {frequency: 224 },
+                doConnect: true
+            })
+            .children[0]
+            .addChild(nodetypes.GAIN,'frequency', {
+                values: {gain: 76, gain_auxAdsrVal: 4 }
+            })
+            .children[0]
+            .addChild(nodetypes.OSC,'channel', {
+                values: { frequency: 37 },
+                doConnect: true
+            })
+        
+            aux_ADSR.attack = 0.083129376702863738
+            aux_ADSR.decay = 0.99486140259274407
+            ADSR.attack = 0.010416984558105469
+            ADSR.decay = 0.00008349227905273
+            ADSR.sustain = 0.9233901420913412
+            ADSR.release = 0.2001858678519443
+            
+            G.root.gain.yAxisFactor = 0 
+            ADSR.render()
+            aux_ADSR.render()
+            G.update()
+        },
     }
 }

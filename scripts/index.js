@@ -42,8 +42,11 @@ function noteOn(x,y) {
     const adsr = KB.keyConnectsTo[keynum]
     
     adsr.graph.nodes.forEach(node => {
-        for (const prop of numericalControlProperties[node.type]) {
-            if (prop === 'detune') continue;
+        for (const prop of audioParamsOfType[node.type]) {
+
+            if (prop === 'detune') {
+                continue
+            }
         
             const ymap = node[prop].yAxisFactor
             const Y = ymap > 0 ? 1 - vertFactor : vertFactor
@@ -125,7 +128,7 @@ KB.canvas.addEventListener('touchend',   touch)
 function touch(e) {
     if (!e.touches.length) KB.canvas.style.backgroundColor = '#333'
     return KB.processCoordinateArray(
-        [...e.touches].slice(0,nGraphs),
+        [...e.touches].reverse().slice(0,nGraphs),
         noteOn,
         noteOff
     )

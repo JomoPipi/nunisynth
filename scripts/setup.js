@@ -57,7 +57,7 @@ MY_JS_DIALS.forEach(dial => {
             aux_ADSR.render()
         })
 
-    } else {
+    } else if (dial.id.includes('adsr')) {
         
         dial.value = ADSR[dial.id.split`-`[1]]
         dial.render()
@@ -73,7 +73,7 @@ MY_JS_DIALS.forEach(dial => {
 const OSCILLATOR_MAX_FREQUENCY = 17000
 
 const TAU = 2 * Math.PI
-const PHI = (Math.sqrt(5) + 1) / 2.0
+const PHI = (Math.sqrt(5.0) + 1.0) / 2.0
 const logPHI = Math.log(PHI)
 const sliderConstant = Math.log(OSCILLATOR_MAX_FREQUENCY) / logPHI
 const twoThirdsPi = TAU / 3.0

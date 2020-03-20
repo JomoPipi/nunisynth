@@ -9,9 +9,7 @@ G.canvas.addEventListener('mousedown', handleGraphTouch)
 
 
 function setMasterVolume(value) {
-    for (let i = 0; i < nGraphs; i++) {
-        masterGain.gain.setValueAtTime(G.volume = value/2.0, 0)
-    }
+    masterGain.gain.setValueAtTime(G.volume = value, audioCtx.currentTime)
 }
 
 
@@ -39,8 +37,6 @@ function handleGraphTouch(e) {
         // "refill" the node-edit UI
         
         D('node-edit-page-text').innerHTML = `${touched.type} ${touched.id}`
-        // D('y-axis-factor').value = D('y-axis-factor-text').innerHTML = touched.yAxisFactor
-
 
         for (const t in nodetypes) {
             const type = nodetypes[t]
@@ -50,7 +46,7 @@ function handleGraphTouch(e) {
                     D('type-select').value = touched.audioNode.type
                 }
 
-                for (const prop of numericalControlProperties[type]) {
+                for (const prop of audioParamsOfType[type]) {
                     D(`${type}-${prop}-value`).value = touched[prop].value
                     D(`${type}-${prop}-slider`).value = toSliderValue(touched[prop].value)
                 }

@@ -51,13 +51,14 @@ class Keyboard {
         this.lastRequestID = null
         this.modeShift = 0
         this.pitchShift = 0
+        this.detune = 0 
     }
     
 
     getFrequencyFactor(x) {
         const keyNumber = x * this.notesPerOctave * this.octaves | 0
         return (
-            this.kbMode === 'chromatic' ?
+            this.kbMode === 'microtonal' ?
 
                 this.NRT2 ** keyNumber :
 
@@ -78,7 +79,7 @@ class Keyboard {
 
         return [
             TR2 ** this.pitchShift * (
-                this.kbMode === 'chromatic' ?
+                this.kbMode === 'microtonal' ?
 
                     this.NRT2 ** keyNumber :
 
@@ -102,7 +103,7 @@ class Keyboard {
         const W = canvas.width
         const H = canvas.height
 
-        const notChromatic = this.kbMode !== 'chromatic'
+        const notChromatic = this.kbMode !== 'microtonal'
 
         if (notChromatic)
         {   // update: modes, and this is the easiest way to handle them
