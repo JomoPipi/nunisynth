@@ -63,11 +63,12 @@ function noteOn(x,y) {
                 const { attack, decay } = aux_ADSR
                 
                 const t = audioCtx.currentTime
-                const t1 = t + attack
-
+                const t1 = t + attack ** 2
+                
                 property.cancelScheduledValues(t)
-                property.setTargetAtTime(aux_val * value, t, attack)
-                property.setTargetAtTime(value, t1, decay)
+                property.setValueAtTime(value, t)
+                property.linearRampToValueAtTime((2 ** aux_val) * value, t1)
+                property.linearRampToValueAtTime(value, t1 + decay ** 2)
             }
             else
             {

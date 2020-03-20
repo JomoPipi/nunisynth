@@ -11,8 +11,11 @@ const aux_ADSR = {
     release: 0.4812504768371582
 }
 {
+    // create render functions for these ADSR's
 
     ;[['aux-',aux_ADSR],['',ADSR]].forEach(([s,adsr]) => {
+
+        const isAux = s === 'aux-'
 
         adsr.canvas = document.getElementById(s + 'adsr-visual')
         const ctx = adsr.canvas.getContext('2d')
@@ -20,7 +23,6 @@ const aux_ADSR = {
         adsr.render = function () {
             const H = this.canvas.height, W = this.canvas.width
             ctx.lineWidth = 5
-
 
             const sum = this.attack + this.decay + 0.25 + this.release
             const adsrWidths = [
@@ -37,14 +39,22 @@ const aux_ADSR = {
             const t4 = 1
             const margin = 20
 
-            ctx.clearRect(0,0,W,H)
-            let lastX = margin, lastY = H - margin
-            ;[
+            const arr = [
                 [t1, 0],
                 [t2, 1 - this.sustain],
                 [t3, 1 - this.sustain],
                 [t4, 1]
-            ].forEach(([x,y],i) => {
+            ]
+
+            if (isAux) {
+                // the only difference between ADSR and AD
+                arr[1][1] = 1
+                arr[2] = arr[3]
+            }
+
+            ctx.clearRect(0,0,W,H)
+            let lastX = margin, lastY = H - margin
+            arr.forEach(([x,y],i) => {
                 ctx.beginPath()
                 ctx.moveTo(lastX, lastY)
                 ctx.strokeStyle = '#8a8,#a88,#88a,#a8a'.split`,`[i]
@@ -57,6 +67,9 @@ const aux_ADSR = {
             })
             ctx.closePath()
         }
+
+
+
         adsr.render()
     })
 }

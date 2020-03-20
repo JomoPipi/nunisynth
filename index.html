@@ -33,7 +33,7 @@
     <div id="graph-page" class='page'>
 
         <!-- GOTO KEYBOARD PAGE  -->
-        <button class='neumorph2 tr-corner' onclick="
+        <button class='neumorph2 big tr-corner' onclick="
             showPage(D('keyboard-page'))
         "> keyboard </button>
 
@@ -49,12 +49,15 @@
         <!-- NODE EDIT PAGE  -->
         <div id="node-edit-page">
 
-            <button class="neumorph2"
+            <button class="neumorph2 big"
                 onclick="leaveNodeEditPage()"> back &lt;= </button>
 
             <!-- NODE TYPE AND ID  -->
             <span id="node-edit-page-text"> This message shouldn't be here by the time the page loads. </span> 
-            <br>
+
+            <!-- DELETE NODE  -->
+            <button class="tr-corner neumorph2" style="color:rgba(255, 81, 0, 0.817)"
+                onclick="if (confirm('really delete?')) handleDeleteNode()"> delete this node </button> 
 
             <div id="osc-gain-filter">
                 <!-- SEE "createNodeEditPage.js"  -->
@@ -63,19 +66,25 @@
             <div id="mappings-page" style="display: none;" class="neumorph2">
                 <div id="mapping-type-text"></div>
 
-                <span> y-axis connection with keyboard: </span>
-                <span id="y-axis-factor-text"></span>
-                <input type="range" id="y-axis-factor" class="neumorph2" min=-9 max=9 value=0 step=0.25>
+                <div class="mappings-page-grid">
+
+                    <span> y-axis connection with keyboard: </span>
+                    <span id="y-axis-factor-text"></span>
+                    <input type="range" id="y-axis-factor" class="neumorph2 mappings-page-slider" 
+                        min=-9 max=9 value=0 step=0.25>
+
+
+                    <span> AUX-ADSR FACTOR (0 for none): </span>
+                    <span id="aux-adsr-text"></span>
+                    <input type="range" id="aux-adsr-val" class="neumorph2 mappings-page-slider" 
+                        min=-8 max=8 value=0 step=0.25>
+                    <!-- <input type="number" id="aux-adsr-val" class="neumorph2 selectable"> -->
+                
+
+                </div>
             
-                <br>
-                <span> envelope-factor (aux-ADSR): </span>
-                <input type="number" id="aux-adsr-val" class="neumorph2 selectable">
             </div>
 
-
-            <!-- DELETE NODE  -->
-            <button style="position: absolute; bottom:0; right: 0;"
-                onclick="handleDeleteNode()"> delete this node </button> 
 
         </div>
         <!-- END NODE EDIT PAGE -->
@@ -222,6 +231,7 @@
                                 <option value="0"> belly_bells </option>
                                 <option value="1"> phi organ </option>
                                 <option value="4"> durty_bass </option>
+                                <option value="5"> techno </option>
                             </select> 
 
                             <!-- ENTER ADVANCED CONTROLS  -->
@@ -264,63 +274,63 @@
                         <!-- ADSR -->
                         <div id="adsr-box">
 
-                            <span class="text0"> GAIN ADSR </span> 
+                            <div id="gain-adsr">
 
-                            <br>
+                                <span class="text0"> GAIN ADSR </span> 
 
-                            <span class="shadow-knob">
-                                <div id="adsr-attack" class="js-dial">
-                                </div>
-                            </span>
+                                <br>
+    
+                                <canvas id="adsr-visual"></canvas>
+                                
+                                <br>
 
-                            <span class="shadow-knob">
-                                <div id="adsr-decay" class="js-dial">
-                                </div>
-                            </span>
+                                <span class="shadow-knob">
+                                    <div id="adsr-attack" class="js-dial">
+                                    </div>
+                                </span>
+    
+                                <span class="shadow-knob">
+                                    <div id="adsr-decay" class="js-dial">
+                                    </div>
+                                </span>
+    
+                                <br>
+    
+                                <span class="shadow-knob">
+                                    <div id="adsr-sustain" class="js-dial">
+                                    </div>
+                                </span>
+    
+                                <span class="shadow-knob">
+                                    <div id="adsr-release" class="js-dial">
+                                    </div>
+                                </span>
 
-                            <span class="shadow-knob">
-                                <div id="adsr-sustain" class="js-dial">
-                                </div>
-                            </span>
+                            </div>
 
-                            <span class="shadow-knob">
-                                <div id="adsr-release" class="js-dial">
-                                </div>
-                            </span>
+
+
+
+                            <div id="aux-adsr">
+
+                                <span class="text0"> AUX AD<del>SR</del> </span> 
+    
+                                <canvas id="aux-adsr-visual"></canvas>
+
+                                <br>
+    
+                                <span class="shadow-knob">
+                                    <div id="aux-adsr-attack" class="js-dial">
+                                    </div>
+                                </span>
+    
+                                <span class="shadow-knob">
+                                    <div id="aux-adsr-decay" class="js-dial">
+                                    </div>
+                                </span>
+
+                            </div>
                             
-                            <br>
-
-                            <canvas id="adsr-visual"></canvas>
-
-                            <br>
-
-                            <span class="text0"> AUX ADSR </span> 
-
-                            <br>
-
-                            <span class="shadow-knob">
-                                <div id="aux-adsr-attack" class="js-dial">
-                                </div>
-                            </span>
-
-                            <span class="shadow-knob">
-                                <div id="aux-adsr-decay" class="js-dial">
-                                </div>
-                            </span>
-
-                            <span class="shadow-knob">
-                                <div id="aux-adsr-sustain" class="js-dial">
-                                </div>
-                            </span>
-
-                            <span class="shadow-knob">
-                                <div id="aux-adsr-release" class="js-dial">
-                                </div>
-                            </span>
-                            
-                            <br>
-
-                            <canvas id="aux-adsr-visual"></canvas>
                         </div>
 
                         

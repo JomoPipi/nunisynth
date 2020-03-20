@@ -63,7 +63,7 @@ function handleGraphTouch(e) {
             }
         }
 
-        D('oscillator-only-box').style.display = touched.type === 'oscillator' ? 'grid' : 'none'
+        D('oscillator-only-box').style.display = touched.type === nodetypes.OSC ? 'grid' : 'none'
         D('gain-only-box').style.display = touched.type === 'gain' ?             'grid' : 'none'
         D('filter-only-box').style.display = touched.type === 'filter' ?         'grid' : 'none'
 

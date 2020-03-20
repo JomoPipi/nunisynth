@@ -125,7 +125,7 @@ for (const type of Object.values(nodetypes)) {
             const channelButton = _E('button')
             channelButton.innerHTML = _type + ' input channel'
             channelButton.onclick = function() {
-                G.selectedNode.addChild(_type, 'channel')
+                G.selectedNode.addChild(_type, 'channel', { doConnect: _type === nodetypes.OSC })
                 G.update()
             }
 
@@ -151,6 +151,7 @@ function toggleMappingsPage(prop) {
     const typetext = D('mapping-type-text')
     const p = D('mappings-page')
     const text = D('y-axis-factor-text')
+    const auxtext = D('aux-adsr-text')
     const title = prop + ' - mappings'
     const differs = title !== typetext.innerHTML
     typetext.innerHTML = title
@@ -166,9 +167,9 @@ function toggleMappingsPage(prop) {
         }
 
         const auxval = D('aux-adsr-val')
-        auxval.value = G.selectedNode[prop].auxAdsrVal
+        auxtext.innerHTML = auxval.value = G.selectedNode[prop].auxAdsrVal
         auxval.oninput = function() {
-            G.selectedNode[prop].auxAdsrVal = +this.value
+            auxtext.innerHTML = G.selectedNode[prop].auxAdsrVal = +this.value
         }
 
     } else {

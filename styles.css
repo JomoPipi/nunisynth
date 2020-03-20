@@ -38,7 +38,7 @@
     rgba(190, 190, 190, 0.489) 50%, 
     rgb(255, 255, 220) 100%);
 
-  --secondary: rgba(0, 255, 145, 0.503);
+  --secondary: rgba(167, 199, 145, 0.564);
 }
 .page{
   display:none; 
@@ -274,7 +274,8 @@ button {
 /* 61.803398875% 38.196601124999996%; */
 
 #adsr-box {
-  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
 .shadow-knob {
   display: inline-block;
@@ -308,11 +309,11 @@ button {
 }
 #adsr-visual {
   display: inline-block;
-  width: 50%;
+  width: 80%;
 }
 #aux-adsr-visual {
   display: inline-block;
-  width: 50%;
+  width: 80%;
 }
 
 
@@ -344,14 +345,17 @@ button {
 .neumorph2 {
   border: none;
   border-radius: .3em;
-
   /* background: linear-gradient(145deg, #3d3d3d, #494949); */
+  font-size: 1em;
   box-shadow:  
     5px 5px 10px #42424215, 
     -5px -5px 10px hsla(189, 26%, 46%, 0.258);
 
   color: var(--bg0);
   cursor: pointer;
+}
+.big {
+  font-size: 2em;
 }
 
 /* from createNodeEditPage.js */
@@ -380,8 +384,10 @@ button {
   width: auto;
   margin-right: 20%;
 }
-#y-axis-factor {
-  width:50%;
+
+.mappings-page-grid {
+  display: grid;
+  grid-template-columns:  45% 5% 50%;
 }
 .selectable {
 

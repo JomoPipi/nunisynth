@@ -53,7 +53,7 @@ MY_JS_DIALS.forEach(dial => {
         dial.value = aux_ADSR[dial.id.split`-`[2]]
         dial.render()
         dial.attach(x => {
-            aux_ADSR[dial.id.split`-`[2]] = x * x
+            aux_ADSR[dial.id.split`-`[2]] = x
             aux_ADSR.render()
         })
 

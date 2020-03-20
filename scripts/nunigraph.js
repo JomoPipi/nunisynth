@@ -29,7 +29,19 @@ const defaultPropertyValues = {
 }
 
 const setDestination = type => {
+    /*
+        channel connection: node1.connect(node2)        // x => x       (do nothing)
+        other:              node1.connect(node2[param]) // x => x[type] (access the audioParam)
+    */
     return type === 'channel' ? x => x : x => x[type]
+}
+
+const connectionTypeColors = {
+    channel:   'gray',
+    frequency: 'blue',
+    detune:    'green',
+    gain:      'orange',
+    Q:         'purple'
 }
 
 
@@ -53,17 +65,27 @@ class GraphNode {
 
 class NuniGraphNode extends GraphNode {
 
+
+
+
     constructor(parent, type, connectionType, options={}){
         super(parent)
-        const { doConnect, yAxisFactor, values={} } = options
-        this.hasNuniParent = parent instanceof NuniGraphNode
+        
         this.type = type
         this.connectionType = connectionType
-        this.connectedToKeyboard = doConnect // oscillator only property (or wav inputs, too?)
-        this.yAxisFactor = yAxisFactor || 0
+        this.parentIsNuni = parent instanceof NuniGraphNode
+
+        const { doConnect, audioNodeType, values={} } = options
+        
+        this.connectedToKeyboard = doConnect            // oscillator only property (or wav inputs, too?)
         this.audioNode = audioCtx[createNode[type]]()
 
-        if (type === nodetypes.OSC) this.audioNode.start()
+        if (audioNodeType)
+            this.audioNode.type = audioNodeType
+
+        if (type === nodetypes.OSC) 
+            this.audioNode.start()
+
         for (const prop of numericalControlProperties[type]) {
 
             this[prop] = {}
@@ -72,18 +94,25 @@ class NuniGraphNode extends GraphNode {
 
             // it may come pre-set
             this[prop].yAxisFactor = values[prop + '_yAxisFactor'] || 0
-            this[prop].auxAdsrVal = values[prop + '_auxAdsrVal']
+            this[prop].auxAdsrVal = values[prop + '_auxAdsrVal'] || 0
         }
         
-        const location = setDestination(connectionType)(this.hasNuniParent ? parent.audioNode : parent)
-        // console.log('loc = ',this.type, parent, connectionType)
+        const location = setDestination(connectionType)(this.parentIsNuni ? parent.audioNode : parent)
         
         this.audioNode.connect(location)
     }
+
+
+    
+
     setMapping(property, maptype, factor) {
         // the Keyboard object knows what to do with this
         this[property][maptype] = factor
     }
+
+
+
+
     setValueOf(property, value) {
         /*
         property :: string
@@ -94,12 +123,18 @@ class NuniGraphNode extends GraphNode {
         this[property].value = value
         this.audioNode[property].setValueAtTime(value, 0)
     }
-    // connectionType
+
+
+    
+    
     addChild(type, connectionType, options) {
         const node = new NuniGraphNode(this, type, connectionType, options)
         this.children.push(node)
         return this
     }
+
+
+
 
     addEntireGraph(root) {
 
@@ -107,12 +142,12 @@ class NuniGraphNode extends GraphNode {
             (a[v] = root[v].value, a)
         , {})
         for (const prop of numericalControlProperties[root.type]) {
-            values[prop + '_yAxisFactor'] = root[prop].yAxisFactor || 0
+            values[prop + '_yAxisFactor'] = root[prop].yAxisFactor
             values[prop + '_auxAdsrVal'] = root[prop].auxAdsrVal
         }
         const settings = {
             doConnect: root.connectedToKeyboard,
-            yAxisFactor: root.yAxisFactor,
+            audioNodeType: root.audioNode.type,
             values: values
         }
         this.addChild(root.type, root.connectionType, settings)
@@ -123,9 +158,14 @@ class NuniGraphNode extends GraphNode {
         }
     }
 
+
+
+
     wipe() { 
+        this.children.forEach(child => child.wipe()) // - I wonder if it's really necessary but whatever
+
         const p = this.parent
-        if (!p || !this.hasNuniParent) {
+        if (!p || !this.parentIsNuni) {
             this.children.forEach(child => child.audioNode.disconnect())
             this.children.length = 0
         } else {
@@ -135,7 +175,14 @@ class NuniGraphNode extends GraphNode {
         }
     }
 
+
 }
+
+
+
+
+
+
 
 
 class BaseGraph {
@@ -179,9 +226,8 @@ class NuniGraph extends BaseGraph {
         const G = new NuniGraph(adsr, E('canvas'), {})
 
         G.root.gain.value = this.root.gain.value
-        G.root.yAxisFactor = this.root.yAxisFactor
         for (const prop of numericalControlProperties[this.root.type]) {
-            G.root[prop].yAxisFactor = this.root[prop].yAxisFactor || 0
+            G.root[prop].yAxisFactor = this.root[prop].yAxisFactor
             G.root[prop].auxAdsrVal = this.root[prop].auxAdsrVal
         }
         
@@ -275,7 +321,7 @@ class NuniGraph extends BaseGraph {
                 
                 this.ctx.fillStyle = c === this.selectedNode ? 'red' : nodeColor
                 
-                const [R,G,B] = [0, (c.yAxisFactor * 255 / 9.0 | 0), (+ctkb||0) * 255]
+                const [R,G,B] = [0, (c[prop].yAxisFactor * 255 / 9.0 | 0), (+ctkb||0) * 255]
 
                 this.ctx.strokeStyle = `rgb(${R},${G},${B})`
 
@@ -289,8 +335,9 @@ class NuniGraph extends BaseGraph {
                 
                 this.circle(X, Y, r)
 
-                this.ctx.strokeStyle = 'red'
-                if (c.hasNuniParent) {
+                this.ctx.strokeStyle = connectionTypeColors[ c.connectionType ] || 'pink'
+
+                if (c.parentIsNuni) {
                     this.line(X, Y,
                         c.parent.display.x,
                         c.parent.display.y
