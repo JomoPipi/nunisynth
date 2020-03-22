@@ -61,7 +61,7 @@
     margin: 0;
     padding: 0;
     overscroll-behavior: none;
-    font-size: 30px;
+    font-size: 25px;
 
     touch-action: none;
     background: transparent;
@@ -80,6 +80,8 @@
 html {
   background-color: var(--bg0);
 }
+
+
 * :focus {
   outline: none;
 }
@@ -102,13 +104,16 @@ html {
   background-color: var(--ssColor);
   text-align: center;
   align-items: center;
-  font-size: 4.9em;
+  font-size: 1em;
   background-image: url('images/logo.png');
-  background-size: fit;
+  background-size: 25%;
   background-position: center center;
   background-repeat: no-repeat;
 }
-
+.start-screen-after {
+  background-image: url('images/culito.png');
+  background-size: 75%;
+}
 
 
 
@@ -117,23 +122,48 @@ html {
 
 
 .wood-element {
+  /* background-image:  linear-gradient(
+    180deg, 
+    rgba(100, 100, 255, 0.122) 0%, 
+    rgba(100, 234, 255, 0.095) 50%, 
+    rgba(100, 100, 255, 0.108) 100%),
+
+    url('images/wood.jpg'); */
+
   display: inline-block;
-  background-image: url('images/wood.jpg');
+
   width: 7%;
+  max-width: 7%;
   height: 100%;
   overflow: hidden;
 }
-.left-wood-element {
+.left-wood-element { 
+  background-image:  linear-gradient(
+    90deg, 
+    rgba(255, 255, 255, 0.143) 0%, 
+    rgba(255, 255, 255, 0.211) 50%, 
+    rgba(0, 0, 0, 0.292) 100%),
+    url('images/wood.jpg');
+
   background-position: right;
-  background-size: 200% 100%;
+  background-size: 300% 100%;
+  box-shadow:  
+    15px 15px 15px #000000, 
+    -15px -15px 15px #000000;
 }
 .right-wood-element {
-  background-position: right;
-  background-size: 100% 100%;
-
-  background-image:
-    linear-gradient(0deg, rgba(8, 0, 255, 0.1), rgba(0, 200, 255, 0.2)),
+  background-image:  linear-gradient(
+    90deg, 
+    rgba(255, 255, 255, 0.143) 0%, 
+    rgba(255, 255, 255, 0.211) 50%, 
+    rgba(0, 0, 0, 0.292) 100%),
     url('images/wood.jpg');
+  
+  background-position: right;
+  background-size: 300% 100%;
+  box-shadow:  
+    15px 15px 15px #000000, 
+    -15px -15px 15px #000000;
 }
 
 
@@ -156,7 +186,6 @@ html {
 
 
 
-
 #side-panel-container { 
   position: absolute;
   background-color: var(--bg0);
@@ -171,22 +200,30 @@ html {
   right: 0;
   transition: width 0.2s;
   display: none;
-  height: 100vh;
+  height: 100%;
   vertical-align: top;
   pointer-events: none;
 }
 .side-panel-content {
   width: 100%;
+  height: 100%;
   display: inline-flex;
   flex-direction: column; 
   align-items: center;
 }
-.controls {
+#main-controls {
   width: 90%;
-  display: inline-block;
+  height: 100%;
+  margin: 5%;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  box-sizing: border-box;
 }
+
+
 .text0{
   color: #999;
+  font-size: 0.6em;
 }
 
 
@@ -211,7 +248,6 @@ select {
   background-position: center right;
   background-repeat: no-repeat;
 
-  font-size: 2em;
   margin: 0;
   overflow: hidden;
   padding-top: 2px;
@@ -228,8 +264,6 @@ button {
 .neumorph {
   color: var(--selectColor);
   border: none;
-  padding: 5px;
-  margin: 5px;
   border-radius: .3em;
 
   background: linear-gradient(145deg, #3d3d3d, #494949);
@@ -241,23 +275,23 @@ button {
   cursor: pointer;
 }
 .circle {
-  width: 80px;
-  height: 80px;
-  border-radius: 100%;
-  margin-left: 7px;
-  font-size: 1.5em;
+  width: 64px;
+  height: 40px;
+  border-radius: 25px;
+  margin: 5%;
 }
 #tone-container {
   display: grid;
-  grid-template-columns: 20% 70% 10%;
+  grid-template-columns: 20% 60% 20%;
   
+}
+#notes-per-octave-box {
+  width: 50%;
 }
 #root-note-select {
   border: none;
 }
-#keyboard-mode {
-  font-size: 1.5em;
-}
+
 #voice-container {
   display: grid;
   grid-template-columns: 80% 20%;
@@ -276,8 +310,12 @@ button {
   width: 100%;
   height: 100%;
   color: var(--secondary);
-  font-size: 1.5em;
 }
+
+
+
+
+
 
 
 /* 61.803398875% 38.196601124999996%; */
@@ -295,9 +333,9 @@ button {
 .shadow-knob {
   display: inline-block;
 
-  margin-left: 12px;
-  width: 80px;
-  height: 80px;
+  margin-left: 6px;
+  width: 40px;
+  height: 40px;
 
   border-radius: 100%;
   background-image: url('images/shadow-knob.png');
@@ -309,8 +347,8 @@ button {
   display: inline-block;
   border: 0px groove #eee;
   box-sizing: border-box;
-  width: 80px;
-  height: 80px;
+  width: 40px;
+  height: 40px;
 
   border-radius: 100%;
   
@@ -320,7 +358,6 @@ button {
   opacity: .4;
   pointer-events: auto;
 
-  transform: none;
 }
 #adsr-visual {
   display: inline-block;
@@ -369,14 +406,15 @@ button {
   color: var(--bg0);
   cursor: pointer;
 }
-.big {
-  font-size: 2em;
-}
+
 
 /* from createNodeEditPage.js */
 .selected {
   background-color: rgba(0, 255, 96, 0.09);
   background: rgba(0, 255, 96, 0.09);
+}
+.selected2 {
+  background: rgba(0, 255, 100, 0.129);
 }
 .node-properties {
   display: grid;
@@ -442,9 +480,9 @@ input[type=range]::-webkit-slider-runnable-track {
   border-radius: 5px;
 }
 input[type=range]::-webkit-slider-thumb {
-  margin-top: -18px;
-  height: 60px;
-  width: 60px;
+  margin-top: -2px;
+  height: 30px;
+  width: 30px;
   border-radius: 1em;
   cursor: pointer;
   -webkit-appearance: none;
@@ -462,9 +500,8 @@ input[type=range]::-moz-range-track {
   border: 1px solid #000000;
 }
 input[type=range]::-moz-range-thumb {
-  box-shadow: 1px 1px 1px #000000;
-  height: 60px;
-  width: 60px;
+  height: 30px;
+  width: 30px;
   margin-top: -20px;
   border-radius: 1em;
   border: 1px solid #51005f53;
@@ -494,8 +531,8 @@ input[type=range]::-ms-fill-upper {
 input[type=range]::-ms-thumb {
   margin-top: 1px;
   box-shadow: 1px 1px 1px #000000;
-  height: 60px;
-  width: 60px;
+  height: 30px;
+  width: 30px;
   margin-top: -20px;
   border-radius: 1em;
   border: 1px solid #51005f53;
@@ -529,7 +566,7 @@ input[type=range]:focus::-ms-fill-upper {
   margin-left: 50px;
 }  
 input[type=range]#vol-slider::-webkit-slider-thumb {
-  margin-top: -27px;
+  margin-top: -13px;
 } 
 
 input[type=range]#vol-slider::-webkit-slider-runnable-track {

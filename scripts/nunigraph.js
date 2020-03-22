@@ -24,7 +24,7 @@ const audioParamsOfType = {
 
 const defaultPropertyValues = {
     frequency: 330,
-    detune: 100,
+    detune: 0,
     gain: 0.5,
     Q: 1
 }
@@ -45,7 +45,7 @@ const connectionTypeColors = {
     Q:         'purple'
 }
 
-
+const dummyNode = audioCtx.createGain()
 
 
 const NuniGraph = (_ => {
@@ -134,7 +134,18 @@ class NuniGraphNode extends GraphNode {
         return this
     }
 
-
+    makeCopyFunction() {
+        const parent = dummyNode
+        const root = new NuniGraphNode(parent, nodetypes.GAIN, 'channel')
+        root.addEntireGraph(this)
+        
+        return realParent => {
+            root.audioNode.disconnect(parent)
+            root.parent = null
+            realParent.addEntireGraph(root)
+            G.update()
+        }
+    }
 
 
     addEntireGraph(root) {
@@ -222,12 +233,9 @@ class NuniGraph extends BaseGraph {
         this.animate = animate
         this.animationSpeed = 40
         this.depth = 1
-        this.nodeRadius = 40
+        this.nodeRadius = 20
     }
 
-
-
-    
     copy(adsr) {
         
         const G = new NuniGraph(adsr, E('canvas'), {})

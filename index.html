@@ -7,7 +7,7 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=0.5, minimum-scale=0.5, maximum-scale=0.5, user-scalable=0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
     
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
@@ -49,7 +49,7 @@
 
 
         <!-- GOTO KEYBOARD PAGE  -->
-        <button class='neumorph2 big tr-corner' onclick="
+        <button class='neumorph2 tr-corner' onclick="
             showPage(D('keyboard-page'))
         "> keyboard </button>
 
@@ -68,7 +68,7 @@
         <!-- NODE EDIT PAGE  -->
         <div id="node-edit-page">
 
-            <button class="neumorph2 big"
+            <button class="neumorph2"
                 onclick="leaveNodeEditPage()"> back &lt;- </button>
 
             <!-- NODE TYPE AND ID  -->
@@ -136,11 +136,6 @@
             <canvas id="keyboard"></canvas>
                 
             <div class="wood-element right-wood-element" onclick="KB.toggleSidePanel()">
-
-                <!-- <button id="open-panel" class='neumorph toggle-sidepanel' onclick="KB.toggleSidePanel()">
-                    &lt;&lt;
-                </button> -->
-                
             </div>
 
 
@@ -148,140 +143,216 @@
                 <div class="side-panel-content">
 
 
+                    
+
+                    <!-- START MAIN CONTROLS  -->
+                    <div id="main-controls">
+                        
 
 
-                    <div id="main-controls" class="controls">
-                        <!-- <button class='neumorph tr-corner' onclick="
-                            showPage(D('graph-page'))
-                        "> advanced </button> -->
 
-                        <div id="tone-container" class="neumorph">
+                        <div id="top-controls">
 
-                            <!-- CHOOSE ROOT NOTE  -->
-                            <select id="root-note-select"
-                                oninput="
-                                    KB.pitchShift = +(this.value.split`-`[1])
-                                    D('notes-per-octave-box').style.display = this.value === 'microtonal' ? 'inline' : 'none'
-                                    KB.update()
-                                ">
-                                <option value="shift-0">      C       </option>
-                                <option value="shift-1">      C#       </option>
-                                <option value="shift-2">      D       </option>
-                                <option value="shift-3">      D#       </option>
-                                <option value="shift-4">      E       </option>
-                                <option value="shift-5">      F       </option>
-                                <option value="shift-6">      F#       </option>
-                                <option value="shift-7">      G       </option>
-                                <option value="shift-8">      G#       </option>
-                                <option value="shift-9">      A       </option>
-                                <option value="shift-10">     A#       </option>
-                                <option value="shift-11">     B       </option>
-                                <option value="shift-12">     C       </option>
-                            </select>
+                            <div id="tone-container" class="neumorph">
 
-
-                            <!-- CHOOSE KEYBOARD MODE  -->
-                            <select id="keyboard-mode" name="keyboardmode"
-                                oninput="
-                                    KB.kbMode = this.value
-                                    D('notes-per-octave-box').style.display = this.value === 'microtonal' ? 'inline' : 'none'
-                                    KB.update()
-                                ">
-                                <option value="major">      Major       </option>
-                                <option value="dorian">     Dorian      </option>
-                                <option value="phrygian">   Phrygian    </option>
-                                <option value="lydian">     Lydian      </option>
-                                <option value="mixolydian"> Mixolydian  </option>
-                                <option value="minor">      Minor       </option>
-                                <option value="locrian">    Locrian     </option>
-                                <option value="microtonal"> Microtonal  </option>
-                            </select> 
-
-                            <!-- CHOOSE NOTES PER OCTAVE (IF MODE == MICROTONAL) -->
-                            <span id="notes-per-octave-box" style='display:none'>
-                                <select id="notes-per-octave" 
+                                <!-- CHOOSE ROOT NOTE  -->
+                                <select id="root-note-select"
                                     oninput="
-                                        KB.notesPerOctave = +this.value
-                                        KB.NRT2 = 2 ** (1 / (+this.value))
+                                        KB.pitchShift = +(this.value.split`-`[1])
+                                        D('notes-per-octave-box').style.display = this.value === 'microtonal' ? 'inline' : 'none'
                                         KB.update()
                                     ">
-                                    <option value="1"> 1 </option>
-                                    <option value="2"> 2 </option>
-                                    <option value="3"> 3 </option>
-                                    <option value="4"> 4 </option>
-                                    <option value="5"> 5 </option>
-                                    <option value="6"> 6 </option>
-                                    <option value="7"> 7 </option>
-                                    <option value="8"> 8 </option>
-                                    <option value="9"> 9 </option>
-                                    <option value="10"> 10 </option>
-                                    <option value="11"> 11 </option>
-                                    <option value="12"> 12 </option>
-                                    <option value="13"> 13 </option>
-                                    <option value="14"> 14 </option>
-                                    <option value="15"> 15 </option>
-                                    <option value="16"> 16 </option>
-                                    <option value="17"> 17 </option>
-                                    <option value="18"> 18 </option>
-                                    <option value="19"> 19 </option>
-                                    <option value="20"> 20 </option>
-                                    <option value="21"> 21 </option>
-                                    <option value="22"> 22 </option>
-                                    <option value="23"> 23 </option>
-                                    <option value="24"> 24 </option>
+                                    <option value="shift-0">      C       </option>
+                                    <option value="shift-1">      C#       </option>
+                                    <option value="shift-2">      D       </option>
+                                    <option value="shift-3">      D#       </option>
+                                    <option value="shift-4">      E       </option>
+                                    <option value="shift-5">      F       </option>
+                                    <option value="shift-6">      F#       </option>
+                                    <option value="shift-7">      G       </option>
+                                    <option value="shift-8">      G#       </option>
+                                    <option value="shift-9">      A       </option>
+                                    <option value="shift-10">     A#       </option>
+                                    <option value="shift-11">     B       </option>
+                                    <option value="shift-12">     C       </option>
                                 </select>
-                            </span>
-                        </div>
-                        
-                        <br>
 
-                        <!-- CHOOSE NUMBER OF OCTAVES -->
-                        <label for="pitchrange" class="text0"> octaves </label>
-                        <span id="pitch-range-text" class="text0"> 3 </span>
-                        <button class="neumorph circle"
-                        onclick="
-                            KB.rows = Math.max(KB.rows-1,1)
-                            KB.octaves = D('pitch-range-text').innerHTML = KB.rows
-                            KB.update()
-                        "> - </button>
 
-                        <button class="neumorph circle"
-                        onclick="
-                            KB.rows = Math.min(KB.rows+1,7)
-                            KB.octaves = D('pitch-range-text').innerHTML = KB.rows
-                            KB.update()
-                        "> + </button>
-                        
-                        <br>
+                                <!-- CHOOSE KEYBOARD MODE  -->
+                                <select id="keyboard-mode" name="keyboardmode"
+                                    oninput="
+                                        KB.kbMode = this.value
+                                        D('notes-per-octave-box').style.display = this.value === 'microtonal' ? 'inline' : 'none'
+                                        KB.update()
+                                    ">
+                                    <option value="major">      Major       </option>
+                                    <option value="dorian">     Dorian      </option>
+                                    <option value="phrygian">   Phrygian    </option>
+                                    <option value="lydian">     Lydian      </option>
+                                    <option value="mixolydian"> Mixolydian  </option>
+                                    <option value="minor">      Minor       </option>
+                                    <option value="locrian">    Locrian     </option>
+                                    <option value="microtonal"> Microtonal  </option>
+                                </select> 
 
-                        <div id="voice-container" class="neumorph">
-                            <!-- CHOOSE PRESET  -->
-                            <select  class="voice-select" style="font-size:1.7em"
-                            oninput="
-                                disconnectShadowGraphs()
-                                preset(G)[this.value]()
-                                connectShadowGraphs()
-                            ">
-                                <option value="0"> belly_bells </option>
-                                <option value="1"> phi organ </option>
-                                <option value="4"> durty_bass </option>
-                                <option value="5"> techno </option>
-                                <option value="6"> big_trumpet </option>
-                            </select> 
+                                <!-- CHOOSE NOTES PER OCTAVE (IF MODE == MICROTONAL) -->
+                                <span id="notes-per-octave-box" style='display:none'>
+                                    <select id="notes-per-octave" 
+                                        oninput="
+                                            KB.notesPerOctave = +this.value
+                                            KB.NRT2 = 2 ** (1 / (+this.value))
+                                            KB.update()
+                                        ">
+                                        <option value="1"> 1 </option>
+                                        <option value="2"> 2 </option>
+                                        <option value="3"> 3 </option>
+                                        <option value="4"> 4 </option>
+                                        <option value="5"> 5 </option>
+                                        <option value="6"> 6 </option>
+                                        <option value="7"> 7 </option>
+                                        <option value="8"> 8 </option>
+                                        <option value="9"> 9 </option>
+                                        <option value="10"> 10 </option>
+                                        <option value="11"> 11 </option>
+                                        <option value="12"> 12 </option>
+                                        <option value="13"> 13 </option>
+                                        <option value="14"> 14 </option>
+                                        <option value="15"> 15 </option>
+                                        <option value="16"> 16 </option>
+                                        <option value="17"> 17 </option>
+                                        <option value="18"> 18 </option>
+                                        <option value="19"> 19 </option>
+                                        <option value="20"> 20 </option>
+                                        <option value="21"> 21 </option>
+                                        <option value="22"> 22 </option>
+                                        <option value="23"> 23 </option>
+                                        <option value="24"> 24 </option>
+                                    </select>
+                                </span>
+                            </div>
 
-                            <!-- ENTER ADVANCED CONTROLS  -->
-                            <button class="edit-voice"
-                                onclick="
-                                    D('main-controls').style.display='none'
-                                    D('advanced-controls').style.display='inline-block'
-                                "
-                            > • • • </button>
+                            <!-- CHOOSE NUMBER OF OCTAVES -->
+                            <button class="neumorph circle"
+                            onclick="
+                                KB.rows = Math.max(KB.rows-1,1)
+                                KB.octaves = KB.rows
+                                KB.update()
+                            "> - </button>
 
-                        </div>
+                            <button class="neumorph circle"
+                            onclick="
+                                KB.rows = Math.min(KB.rows+1,7)
+                                KB.octaves = KB.rows
+                                KB.update()
+                            "> + </button>
+                            
+                            <br>
 
-                        <div>
-                            <br> <br> <br>
-                            coming soon - sequencer
+                            <div id="voice-container" class="neumorph">
+                                <!-- CHOOSE PRESET  -->
+                                <select  class="voice-select"
+                                oninput="
+                                    disconnectShadowGraphs()
+                                    preset(G)[this.value]()
+                                    connectShadowGraphs()
+                                ">
+                                    <option value="0"> belly_bells </option>
+                                    <option value="1"> phi organ </option>
+                                    <option value="4"> durty_bass </option>
+                                    <option value="5"> techno </option>
+                                    <option value="6"> big_trumpet </option>
+                                </select> 
+
+                                <!-- ENTER ADVANCED CONTROLS  -->
+                                <button class="edit-voice"
+                                    onclick="showPage(D('graph-page'))"
+                                > • • • </button>
+
+                            </div>
+
+                                
+                            <div id="detune-box">
+                                <span>
+                                    <span class="text0"> detune </span>
+                                    <span id="detune-text" class="text0"> 0 </span>
+                                </span>
+                                <input type="range" id="detune-amount" min=-50 value=0 max=50 step=1
+                                    oninput="
+                                        KB.detune = D('detune-text').innerHTML = +this.value
+                                        graphs.forEach(G =>
+                                            G.nodes.forEach(node => {
+                                                if (node.type === nodetypes.OSC ||
+                                                    node.type === nodetypes.FILTER)
+                                                {
+                                                    node.detune = node.audioNode.detune.value = KB.detune
+                                                }
+                                            })
+                                        )
+                                    ">
+
+                            </div>
+                            
+                            <!-- ADSR -->
+                            <div id="adsr-box">
+
+                                <div id="gain-adsr">
+
+                                    <!-- <span class="text0"> GAIN ADSR </span> 
+
+                                    <br> -->
+        
+                                    <canvas id="adsr-visual"></canvas>
+                                    
+                                    <br>
+
+                                    <span class="shadow-knob">
+                                        <div id="adsr-attack" class="js-dial">
+                                        </div>
+                                    </span>
+        
+                                    <span class="shadow-knob">
+                                        <div id="adsr-decay" class="js-dial">
+                                        </div>
+                                    </span>
+        
+                                    <br>
+        
+                                    <span class="shadow-knob">
+                                        <div id="adsr-sustain" class="js-dial">
+                                        </div>
+                                    </span>
+        
+                                    <span class="shadow-knob">
+                                        <div id="adsr-release" class="js-dial">
+                                        </div>
+                                    </span>
+
+                                </div>
+
+
+                                <div id="aux-adsr">
+
+                                    <!-- <span class="text0"> AUX AD<del>SR</del> </span>  -->
+        
+                                    <canvas id="aux-adsr-visual"></canvas>
+
+                                    <br>
+        
+                                    <span class="shadow-knob">
+                                        <div id="aux-adsr-attack" class="js-dial">
+                                        </div>
+                                    </span>
+        
+                                    <span class="shadow-knob">
+                                        <div id="aux-adsr-decay" class="js-dial">
+                                        </div>
+                                    </span>
+
+                                </div>
+                                
+                            </div>
+
+
                         </div>
 
 
@@ -289,116 +360,9 @@
                     <!-- END MAIN CONTROLS  -->
 
 
-                    <!-- START ADVANCED CONTROLS  -->
-                    <div id="advanced-controls">
-
-                        <!-- GO TO THE MAIN CONTROLS PAGE  -->
-                        <button class="neumorph" 
-                            onclick="
-                            D('advanced-controls').style.display='none'
-                            D('main-controls').style.display='inline-block'
-                            "> BACK </button>
-
-                        <!-- GO TO THE GRAPH PAGE  -->
-                        <button class="neumorph tr-corner" style="color:var(--secondary)" 
-                            onclick="
-                                showPage(D('graph-page'))
-                            "> DEEP EDIT </button>
-
-                        <br>
-
-                        <div id="detune-box">
-                            <span>
-                                <span class="text0"> detune </span>
-                                <span id="detune-text" class="text0"> 0 </span>
-                            </span>
-                            <input type="range" id="detune-amount" min=-50 value=0 max=50 step=1
-                                oninput="
-                                    KB.detune = D('detune-text').innerHTML = +this.value
-                                    graphs.forEach(G =>
-                                        G.nodes.forEach(node => {
-                                            if (node.type === nodetypes.OSC ||
-                                                node.type === nodetypes.FILTER)
-                                            {
-                                                node.detune = node.audioNode.detune.value = KB.detune
-                                            }
-                                        })
-                                    )
-                                ">
-
-                        </div>
-                        
-                        <!-- ADSR -->
-                        <div id="adsr-box">
-
-                            <div id="gain-adsr">
-
-                                <span class="text0"> GAIN ADSR </span> 
-
-                                <br>
-    
-                                <canvas id="adsr-visual"></canvas>
-                                
-                                <br>
-
-                                <span class="shadow-knob">
-                                    <div id="adsr-attack" class="js-dial">
-                                    </div>
-                                </span>
-    
-                                <span class="shadow-knob">
-                                    <div id="adsr-decay" class="js-dial">
-                                    </div>
-                                </span>
-    
-                                <br>
-    
-                                <span class="shadow-knob">
-                                    <div id="adsr-sustain" class="js-dial">
-                                    </div>
-                                </span>
-    
-                                <span class="shadow-knob">
-                                    <div id="adsr-release" class="js-dial">
-                                    </div>
-                                </span>
-
-                            </div>
-
-
-                            <div id="aux-adsr">
-
-                                <span class="text0"> AUX AD<del>SR</del> </span> 
-    
-                                <canvas id="aux-adsr-visual"></canvas>
-
-                                <br>
-    
-                                <span class="shadow-knob">
-                                    <div id="aux-adsr-attack" class="js-dial">
-                                    </div>
-                                </span>
-    
-                                <span class="shadow-knob">
-                                    <div id="aux-adsr-decay" class="js-dial">
-                                    </div>
-                                </span>
-
-                            </div>
-                            
-                        </div>
-
-                        
-
-
-                    </div>
-                    <!-- END ADVANCED CONTROLS  -->
-
-
                 </div>
             </div>
         </div>
-
 
     </div>
 
@@ -406,7 +370,6 @@
 
 
 </body>
-
 <script src='scripts/dials.js'></script>
 <script src='scripts/adsr.js'></script>
 <script src='scripts/setup.js'></script>

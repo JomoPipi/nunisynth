@@ -1,0 +1,575 @@
+/* globals Trigger, Interactable, GraphemeSplitter, best_image_fit, isColorValid */
+window.bridges["add-text-to-image"] = function(){
+    var input = {
+        data: null,
+        wrapper: null,
+        preview: null
+    };
+    var output = {
+        data: null,
+        wrapper: null,
+        preview: null
+    };
+
+    var font_stylesheet = null;
+    var previewOptions = true;
+    var activeResizer = -1;
+    var shouldRespond = true;
+    var scaleFactor = 1;
+    var resizerOffset = {
+        left: 0,
+        top: 0
+    };
+
+    function selectResizer(pointerX, pointerY, tool) {
+        var options = parseOptions(tool);
+        if (!options) return;
+
+        var cropped = {
+            x : options.left/scaleFactor + resizerOffset.left,
+            y : options.top/scaleFactor + resizerOffset.top,
+            w : options.width/scaleFactor,
+            h : options.height/scaleFactor
+        };
+
+        var scaledPointerX = pointerX;
+        var scaledPointerY = pointerY;
+        
+        activeResizer = inWhatResizer(cropped, scaledPointerX, scaledPointerY);
+        return activeResizer > -1 ? true : false;
+    }
+
+    function deselectResizer() {
+        if (activeResizer >= 0) {
+            activeResizer = -1;
+        }
+        return true;
+    }
+
+    function moveResizer(movementX, movementY, tool) {
+        var options = parseOptions(tool);
+        if (!options) return;
+
+        var delta = resizeAt(activeResizer, movementX, movementY);
+        var updated = {
+            top   : options.top    + delta.top,
+            left  : options.left   + delta.left,
+            width : options.width  + (delta.right - delta.left),
+            height: options.height + (delta.bottom - delta.top)
+        };
+        updated.top = parseInt(updated.top);
+        updated.left = parseInt(updated.left);
+        updated.width = parseInt(updated.width);
+        updated.height = parseInt(updated.height);
+        tool.options.set(updated);
+    }
+
+    var bridge = function() {
+        var tool = this;
+        
+        if (!input.data) {
+            input.data = tool.input.element.querySelector(".data");
+            input.preview = tool.input.element.querySelector(".preview");
+            input.wrapper = input.preview.parentElement;
+
+            output.data = tool.output.element.querySelector(".data");
+            output.preview = tool.output.element.querySelector(".preview");
+            output.wrapper = output.preview.parentElement;
+
+            Interactable.make(input.preview, {
+                onclick: function(x, y) {
+                    shouldRespond = true;
+                    selectResizer(x, y, tool);
+                    tool.convert();
+                },
+                onrelease: function() {
+                    shouldRespond = true;
+                    deselectResizer();
+                    tool.convert();
+                },
+                onscroll: function(dx, dy) {
+                    if (activeResizer >= 0) {
+                        moveResizer(dx, dy, tool);
+                    }
+                    shouldRespond = false;
+                    tool.convert();
+                }
+            });
+            Interactable.disableScroll(input.preview);
+
+            font_stylesheet = document.createElement("style");
+            font_stylesheet.addEventListener("load", function() {
+                window.setTimeout(function(){
+                    tool.convert();
+                }, 250);
+            });
+            document.head.appendChild(font_stylesheet);
+        }
+
+        var empty = tool.input.element.querySelector(".side-box").classList.contains("empty");
+        if (empty) {
+            return;
+        }
+
+        if (optionsEmpty(tool) && previewOptions) {
+            if (tool.trigger != Trigger.EXAMPLE) {
+                var autoWidth  = input.data.width * 0.25;
+                var autoHeight = input.data.height * 0.25;
+                var autoTop    = (input.data.height - autoHeight) / 2;
+                var autoLeft   = (input.data.width - autoWidth) / 2;
+                tool.options.set({
+                    top:    parseInt(autoTop),
+                    left:   parseInt(autoLeft),
+                    width:  parseInt(autoWidth),
+                    height: parseInt(autoHeight)
+                });
+            }
+            previewOptions = false;
+        }
+
+        var options = parseOptions(tool);
+        if (!options) return;
+
+        var top = options.top;
+        var left = options.left;
+        var width = options.width;
+        var height = options.height;
+
+        if (width < 0) {
+            width = -width;
+            left -= width;
+        }
+        if (height < 0) {
+            height = -height;
+            top -= height;
+        }
+        
+        if (input.preview.width != input.preview.clientWidth) {
+            input.preview.width = input.preview.clientWidth;
+            input.preview.height = input.preview.clientHeight;
+            output.preview.width = output.preview.clientWidth;
+            output.preview.height = output.preview.clientHeight;
+        }
+
+        // For some reason, IE completely ignores width and height properties of the canvas.
+        // Fixing it manually.
+        if (input.preview.clientWidth != input.preview.width || input.preview.clientHeight != input.preview.height) {
+            input.preview.style.width  = input.preview.width + "px";
+            output.preview.style.width = output.preview.width + "px";
+            input.preview.style.height  = input.preview.height + "px";
+            output.preview.style.height = output.preview.height + "px";
+        }
+
+        if (width == 0) {
+            width = 1;
+        }
+        if (height == 0) {
+            height = 1;
+        }
+
+        tool.input.showStatus(input.data.width + "×" + input.data.height);
+        tool.output.showStatus(input.data.width + "×" + input.data.height);
+
+        // Extract the right rectangle from input
+        var text = wrapText({
+            width: width,
+            height: height,
+            text: options.text,
+            color: options.color,
+            background: options.background,
+            align: options.align,
+            style: options.font
+        });
+
+        fillTransparencyEffect(input.preview);
+
+        // Fit input.data image inside input.preview image
+        var fitWidth = input.data.width;
+        var fitHeight = input.data.height;
+        var fit = best_image_fit(fitWidth, fitHeight, input.preview.width, input.preview.height);
+
+        scaleFactor = fit.scale;
+        resizerOffset.left = fit.offsetX;
+        resizerOffset.top  = fit.offsetY;
+
+        var scaledLeft  = left/scaleFactor + fit.offsetX;
+        var scaledTop   = top/scaleFactor + fit.offsetY;
+        var scaledWidth = width/scaleFactor;
+        var scaledHeight = height/scaleFactor;
+
+        if (scaledWidth < 1) {
+            scaledWidth = 1;
+        }
+        if (scaledHeight < 1) {
+            scaledHeight = 1;
+        }
+
+        var ctx = input.preview.getContext("2d");
+        ctx.drawImage(input.data, fit.offsetX, fit.offsetY, fit.width, fit.height);
+        ctx.drawImage(text, scaledLeft, scaledTop, scaledWidth, scaledHeight);
+        drawResizers(input.preview, scaledLeft, scaledTop, scaledWidth, scaledHeight);
+
+        fillTransparencyEffect(output.preview);
+
+        // Make output the size of a rectangle, draw the rectangle
+        output.data.width = input.data.width;
+        output.data.height = input.data.height;
+        ctx = output.data.getContext("2d");
+        ctx.drawImage(input.data, 0, 0);
+        ctx.drawImage(text, left, top, width, height);
+
+        if (shouldRespond) {
+            tool.respond();
+        }
+        shouldRespond = true;
+
+        ctx = output.preview.getContext("2d");
+        ctx.drawImage(output.data, fit.offsetX, fit.offsetY, fit.width, fit.height);
+    };
+
+
+
+    function isInRect (rect, x, y) {
+        return (x >= rect.x && y >= rect.y && x <= rect.x+rect.w && y <= rect.y+rect.h);
+    }
+
+    function inWhatResizer (cropped, mouseX, mouseY) {
+        var r = 16;
+        var points = [
+            { x: cropped.x,             y: cropped.y             },
+            { x: cropped.x,             y: cropped.y+cropped.h/2 },
+            { x: cropped.x,             y: cropped.y+cropped.h   },
+            { x: cropped.x+cropped.w/2, y: cropped.y             },
+            { x: cropped.x+cropped.w/2, y: cropped.y+cropped.h/2 },
+            { x: cropped.x+cropped.w/2, y: cropped.y+cropped.h   },
+            { x: cropped.x+cropped.w,   y: cropped.y             },
+            { x: cropped.x+cropped.w,   y: cropped.y+cropped.h/2 },
+            { x: cropped.x+cropped.w,   y: cropped.y+cropped.h   }
+        ];
+
+        for (var i = 0; i < points.length; i++) {
+            var p = points[i];
+            var rect = {
+                x: p.x - r/2,
+                y: p.y - r/2,
+                w: r,
+                h: r
+            };
+
+            if (isInRect(rect, mouseX, mouseY)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    function resizeAt (resizer, dx, dy) {
+        var delta = {
+            top: 0,   // Correlates to Y
+            left: 0,  // Correlates to X
+            right: 0, // Correlates to X
+            bottom: 0 // Correlates to Y
+        };
+        if (resizer == 0) {
+            // Top left resizer, change left and top
+            delta.top += dy;
+            delta.left += dx;
+        }
+        else if (resizer == 1) {
+            // Middle left, change left only
+            delta.left += dx;
+        }
+        else if (resizer == 2) {
+            // Bottom left, change left and bottom
+            delta.left += dx;
+            delta.bottom += dy;
+        }
+        else if (resizer == 3) {
+            // Top, change top
+            delta.top += dy;
+        }
+        else if (resizer == 4) {
+            // Middle, move the selection
+            delta.top += dy;
+            delta.left += dx;
+            delta.right += dx;
+            delta.bottom += dy;
+        }
+        else if (resizer == 5) {
+            // Bottom, change bottom
+            delta.bottom += dy;
+        }
+        else if (resizer == 6) {
+            // Top right, change top and right
+            delta.top += dy;
+            delta.right += dx;
+        }
+        else if (resizer == 7) {
+            // Middle right, change right
+            delta.right += dx;
+        }
+        else if (resizer == 8) {
+            // Bottom right, change right and bottom
+            delta.right += dx;
+            delta.bottom += dy;
+        }
+
+        delta.top = Math.round(delta.top * scaleFactor);
+        delta.left = Math.round(delta.left * scaleFactor);
+        delta.right = Math.round(delta.right * scaleFactor);
+        delta.bottom = Math.round(delta.bottom * scaleFactor);
+
+        return delta;
+    }
+
+    function drawResizers (canvas, x, y, w, h) {
+        var ctx = canvas.getContext("2d");
+        var r = 10;
+        ctx.strokeStyle = "black";
+        ctx.fillStyle = "white";
+        ctx.lineWidth = 2;
+
+        ctx.beginPath();
+        ctx.rect(x, y, w, h);
+        ctx.stroke();
+        ctx.closePath();
+
+        var points = [
+            { x: x,     y: y     },
+            { x: x,     y: y+h/2 },
+            { x: x,     y: y+h   },
+            { x: x+w/2, y: y     },
+            { x: x+w/2, y: y+h/2 },
+            { x: x+w/2, y: y+h   },
+            { x: x+w,   y: y     },
+            { x: x+w,   y: y+h/2 },
+            { x: x+w,   y: y+h   }
+        ];
+
+        for (var i = 0; i < points.length; i++) {
+            var p = points[i];
+            ctx.beginPath();
+            ctx.rect(parseInt(p.x - r/2), parseInt(p.y - r/2), r, r);
+            ctx.fill();
+            ctx.stroke();
+            ctx.closePath();
+        }
+    }
+
+    function importFontFromURL(url) {
+        var css = 
+            "@font-face {" +
+                "font-family: 'Custom';" +
+                "src: url(" + url + ");" +
+            "}";
+        if (font_stylesheet.innerHTML != css) font_stylesheet.innerHTML = css;
+    }
+
+    function optionsEmpty (tool) {
+        var options = tool.options.get();
+        var top    = options.top.trim();
+        var left   = options.left.trim();
+        var width  = options.width.trim();
+        var height = options.height.trim();
+
+        return (top.length == 0 && left.length == 0 &&
+            width.length == 0 && height.length == 0);
+    }
+
+    function parseOptions (tool) {
+        var options = tool.options.get();
+        var top     = +(options.top);
+        var left    = +(options.left);
+        var width   = +(options.width);
+        var height  = +(options.height);
+        var size    = +(options.size || 24);
+
+        var data = tool.input.element.querySelector(".data");
+
+        if (isNaN(top)) {
+            tool.input.showNegativeBadge("Can't add text.", "Top position is not a number.", -1);
+            return false;
+        }
+        if (isNaN(left)) {
+            tool.input.showNegativeBadge("Can't add text.", "Left position is not a number.", -1);
+            return false;
+        }
+        if (isNaN(width)) {
+            tool.input.showNegativeBadge("Can't add text.", "Width is not a number.", -1);
+            return false;
+        }
+        if (isNaN(height)) {
+            tool.input.showNegativeBadge("Can't add text.", "Height is not a number.", -1);
+            return false;
+        }
+        if (isNaN(size)) {
+            tool.input.showNegativeBadge("Can't add text.", "Font Size is not a number.", -1);
+            return false;
+        }
+
+        if (options.width == "") {
+            tool.input.showWarningBadge("Width not set", "Using full width.", -1);
+            width = data.width - left;
+        }
+
+        if (options.height == "") {
+            tool.input.showWarningBadge("Height not set", "Using full height.", -1);
+            height = data.height - top;
+        }
+
+        if (options.left == "") {
+            tool.input.showWarningBadge("Left position not set", "Also ignoring width.", -1);
+            left = 0;
+            width = data.width;
+        }
+
+        if (options.top == "") {
+            tool.input.showWarningBadge("Top position not set", "Also ignoring height.", -1);
+            top = 0;
+            height = data.height;
+        }
+
+        var font = [];
+        if (options.bold) font.push("bold");
+        if (options.italic) font.push("italic");
+        font.push(size + "px");
+        if (options.typeface == "Custom" && options.url) {
+            importFontFromURL(options.url);
+        }
+        font.push(options.typeface);
+
+        return {
+            top: top,
+            text: options.text,
+            left: left,
+            width: width,
+            height: height,
+            color: isColorValid(options.color) ? options.color : "black",
+            background: isColorValid(options.background) ? options.background : "transparent",
+            align: {
+                horizontal: "center",//options["align-left"] ? "left" : (options["align-center"] ? "center" : "right"),
+                vertical: "center"//options["v-align-top"] ? "top" : (options["v-align-center"] ? "center" : "bottom")
+            },
+            font: font.join(" ")
+        };
+    }
+    
+    function wrapText(opts) {
+        var canvas = document.createElement("canvas");
+        var ctx = canvas.getContext("2d");
+        var width = opts.width;
+        var height = opts.height;
+        canvas.width = width;
+        canvas.height = height;
+
+        var text = opts.text;
+
+        ctx.font  = opts.style;
+        ctx.fillStyle = opts.background;
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = opts.color;
+
+        // String "👍" -> Character Split  -> Array ["�", "�"]
+        // String "👍" -> GraphemeSplitter -> Array ["👍"]
+        var chars = (new GraphemeSplitter()).splitGraphemes(text);
+
+        var parts = [];
+        var start = 0;
+        var end   = 1;
+
+        // Iterate the split text by character
+        // "Hello, world": H, He, Hel, Hell, Hello, Hello, <...>
+        for (; end <= chars.length; end++) {
+
+            // Get the cut part as a string
+            var part = chars.slice(start, end).join("");
+
+            // Measure that part
+            var w = ctx.measureText(part).width;
+
+            // If this part goes outside the width boundary
+            // or it ends with a line break, put this part
+            // in parts (for drawing wrapped text) and continue
+            // from the last character 
+            if (w > width || chars[end - 1] == "\n") {
+                parts.push(chars.slice(start, end - 1).join(""));
+                start = end - 1;
+            }
+        }
+
+        // Take care of the last part if it wasn't iterated
+        if (start != end-1) parts.push(chars.slice(start, end).join(""));
+
+        var offset = 1;
+        var lineHeight = ctx.measureText("M").width;
+        var textHeight = parts.length*lineHeight;
+        for (var i = 1; i <= parts.length; i++) {
+            part = parts[i-1].replace(/\n/g, "");
+            if (part) {
+                var vAlign = opts.align.vertical;
+                var hAlign = opts.align.horizontal;
+
+                var x = 0;
+                var y = lineHeight*offset - 3;
+
+                var lineWidth = ctx.measureText(part).width;
+                if (hAlign == "right") {
+                    x = width - lineWidth;
+                }
+                if (hAlign == "center") {
+                    x = (width - lineWidth)/2;
+                }
+                if (vAlign == "bottom") {
+                    y = y + (height - textHeight);
+                }
+                if (vAlign == "center") {
+                    y = y + (height - textHeight)/2;
+                }
+                ctx.fillText(part, x, y);
+                offset++;
+            }
+        }
+
+        return canvas;
+    }
+
+    function fillTransparencyEffect(canvas) {
+        var ctx = canvas.getContext("2d");
+        var w = canvas.width;
+        var h = canvas.height;
+        var size = 15;
+        var odd  = true;
+        for (var i = 0; i <= w; i += size) {
+            for (var j = 0; j <= h; j += size) {
+
+                if (odd) ctx.fillStyle = "#ffffff";
+                else ctx.fillStyle = "#efefef";
+
+                odd = !odd;
+                ctx.fillRect(i, j, i+size, j+size);
+            }
+        }
+    }
+
+    function getExtension() {
+        return this.options.get().extension || "png";
+    }
+
+    return {
+        converter: bridge,
+        config: {
+            type: "image",
+            input: {
+                import: "base64",
+                noClipboard: true,
+                download: getExtension,
+                image: true
+            },
+            output: {
+                download: getExtension,
+                noClipboard: true
+            }
+        }
+    };
+};

@@ -5,8 +5,13 @@ const propertyChildrenTypes = {
     Q: [nodetypes.OSC, nodetypes.GAIN, nodetypes.FILTER]
 }
 
-const isSourceNode = {
+const hasFrequencyParam = {
     [nodetypes.OSC]: true,
+    [nodetypes.FILTER]: true,
+}
+const supportsChannels = {
+    [nodetypes.GAIN]: true,
+    [nodetypes.FILTER]: true,
 }
 
 const typeTypes = {
@@ -101,7 +106,7 @@ for (const type of Object.values(nodetypes)) {
         }
         const mappingsBtn = _E('button')
         mappingsBtn.style.color = '#FBB'
-        mappingsBtn.innerHTML = 'MAPS'
+        mappingsBtn.innerHTML = 'keyboard MAPS'
         mappingsBtn.onclick = _ => toggleMappingsPage(audioParam)
         buttons.appendChild(mappingsBtn)
 
@@ -117,7 +122,7 @@ for (const type of Object.values(nodetypes)) {
         box.appendChild(div)
     }
 
-    if (!isSourceNode[type]) {
+    if (supportsChannels[type]) {
         const box2 = _E('div')
         box2.style.display='grid'
         box2.style.gridTemplateColumns = '1fr 1fr 1fr'
@@ -133,7 +138,9 @@ for (const type of Object.values(nodetypes)) {
             box2.appendChild(channelButton)
         }
         box.appendChild(box2)
-    } else {
+    }
+    
+    if (hasFrequencyParam[type]) {
         const connectBtn = _E('button')
         connectBtn.id = `${type}-kb-connect`
         connectBtn.innerHTML = "pitch with keyboard"

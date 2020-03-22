@@ -1,0 +1,173 @@
+var Interactable = {};
+
+Interactable.enableScroll = function (preview) {
+    preview.setAttribute("data-scroll", "enabled");
+}
+
+Interactable.disableScroll = function (preview) {
+    preview.removeAttribute("data-scroll");
+}
+
+Interactable.setPreviewPosition = function(preview, x, y) {
+    preview.setAttribute("data-scroll-x", parseInt(x));
+    preview.setAttribute("data-scroll-y", parseInt(y));
+}
+
+Interactable.getPreviewPosition = function(preview) {
+    return {
+        x: parseInt(preview.getAttribute("data-scroll-x") || 0),
+        y: parseInt(preview.getAttribute("data-scroll-y") || 0)
+    }
+}
+
+Interactable.changePreviewPosition = function(preview, dx, dy) {
+    var current = Interactable.getPreviewPosition(preview);
+    Interactable.setPreviewPosition(preview, current.x + dx, current.y + dy);
+}
+
+Interactable.centerPreview = function(preview, x, y) {
+    var parent = preview.parentElement;
+
+    var pos = {
+        x: parent.clientWidth/2 - x,
+        y: parent.clientHeight/2 - y
+    }
+
+    Interactable.setPreviewPosition(preview, pos.x, pos.y);
+}
+
+Interactable.make = function (preview, callbacks) {
+    Interactable.enableScroll(preview);
+    if (!callbacks) callbacks = {};
+
+    // Scrolling with mouse
+    preview.addEventListener("mouseup", function(e) {
+        var notEmpty = preview.classList.contains("not-empty");
+        if (notEmpty) {
+
+            var x = parseInt(e.offsetX);
+            var y = parseInt(e.offsetY);
+            preview.setAttribute("data-prev-x", e.screenX);
+            preview.setAttribute("data-prev-y", e.screenY);
+            var pos = Interactable.getPreviewPosition(preview);
+
+            callbacks.onrelease && callbacks.onrelease(x-pos.x, y-pos.y);
+        }
+    })
+    preview.addEventListener("mouseenter", function(e) {
+        var notEmpty = preview.classList.contains("not-empty");
+        if (notEmpty) {
+
+            var x = parseInt(e.offsetX);
+            var y = parseInt(e.offsetY);
+            preview.setAttribute("data-prev-x", e.screenX);
+            preview.setAttribute("data-prev-y", e.screenY);
+            var pos = Interactable.getPreviewPosition(preview);
+
+            if (e.buttons != 1) {
+                callbacks.onrelease && callbacks.onrelease(x-pos.x, y-pos.y);
+            }
+        }
+    })
+    preview.addEventListener("mousedown", function(e) {
+        var notEmpty = preview.classList.contains("not-empty");
+        if (notEmpty) {
+
+            var x = parseInt(e.offsetX);
+            var y = parseInt(e.offsetY);
+            preview.setAttribute("data-prev-x", e.screenX);
+            preview.setAttribute("data-prev-y", e.screenY);
+            var pos = Interactable.getPreviewPosition(preview);
+
+            callbacks.onclick && callbacks.onclick(x-pos.x, y-pos.y);
+        }
+    })
+    preview.addEventListener("mousemove", function(e) {
+        var notEmpty = preview.classList.contains("not-empty");
+        var scrollEnabled = preview.getAttribute("data-scroll");
+        if (notEmpty && e.buttons == 1) {
+
+            e.stopPropagation();
+
+            var prevX = parseInt(preview.getAttribute("data-prev-x") || 0);
+            var prevY = parseInt(preview.getAttribute("data-prev-y") || 0);
+
+            var dx = (prevX ? e.screenX - prevX : 0);
+            var dy = (prevY ? e.screenY - prevY : 0);
+
+            preview.setAttribute("data-prev-x", e.screenX);
+            preview.setAttribute("data-prev-y", e.screenY);
+
+            if (scrollEnabled) {
+                var current = Interactable.getPreviewPosition(preview);
+                var x = current.x + dx;
+                var y = current.y + dy;
+                Interactable.setPreviewPosition(preview, x, y);
+            }
+
+            callbacks.onscroll && callbacks.onscroll(dx, dy);
+        }
+    });
+
+    // Scrolling with touch
+    preview.addEventListener("touchstart", function(e) {
+        var notEmpty = preview.classList.contains("not-empty");
+        if (notEmpty) {
+
+            var rect = preview.getBoundingClientRect();
+            var touch = e.touches[0];
+
+            var x = parseInt(touch.clientX - rect.left);
+            var y = parseInt(touch.clientY - rect.top);
+            preview.setAttribute("data-prev-x", touch.screenX);
+            preview.setAttribute("data-prev-y", touch.screenY);
+            var pos = Interactable.getPreviewPosition(preview);
+
+            callbacks.onclick && callbacks.onclick(x-pos.x, y-pos.y);
+        }
+    });
+    preview.addEventListener("touchend", function(e) {
+        var notEmpty = preview.classList.contains("not-empty");
+        if (notEmpty) {
+
+            var rect = preview.getBoundingClientRect();
+            var touch = e.changedTouches[0];
+
+            var x = parseInt(touch.clientX - rect.left);
+            var y = parseInt(touch.clientY - rect.top);
+            preview.setAttribute("data-prev-x", touch.screenX);
+            preview.setAttribute("data-prev-y", touch.screenY);
+            var pos = Interactable.getPreviewPosition(preview);
+
+            callbacks.onrelease && callbacks.onrelease(x-pos.x, y-pos.y);
+        }
+    });
+    preview.addEventListener("touchmove", function(e) {
+        var notEmpty = preview.classList.contains("not-empty");
+        var scrollEnabled = preview.getAttribute("data-scroll");
+        if (notEmpty) {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            var prevX = parseInt(preview.getAttribute("data-prev-x") || 0);
+            var prevY = parseInt(preview.getAttribute("data-prev-y") || 0);
+
+            var touch = e.touches[0];
+            var dx = parseInt(prevX ? touch.screenX - prevX : 0)
+            var dy = parseInt(prevY ? touch.screenY - prevY : 0);
+
+            preview.setAttribute("data-prev-x", touch.screenX);
+            preview.setAttribute("data-prev-y", touch.screenY);
+
+            if (scrollEnabled) {
+                var current = Interactable.getPreviewPosition(preview);
+                var x = current.x + dx;
+                var y = current.y + dy;
+                Interactable.setPreviewPosition(preview, x, y);
+            }
+
+            callbacks.onscroll && callbacks.onscroll(dx, dy);
+        }
+    });
+}

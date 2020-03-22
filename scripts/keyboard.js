@@ -44,7 +44,7 @@ class Keyboard {
         this.octaves = this.rows = 3
         this.kbMode = 'major',
         this.panelOpen = 0
-        this.panelWidth = .4
+        this.panelWidth = .4 // .4
         this.NRT2 = TR2,
         this.notesPerOctave = 12
         this.keyConnectsTo = {}
@@ -221,7 +221,7 @@ class Keyboard {
             if (!presses.has(+i)) {
                 if (this.keyConnectsTo[i]) {
                     
-                    noteOff(this.keyConnectsTo[i])
+                    noteOff(i)
                 }
                 this.keyConnectsTo[i] = null
             }

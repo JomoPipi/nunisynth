@@ -29,8 +29,12 @@ const D = x => document.getElementById(x)
 
 
 
-// web audio API declaration
+
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+
+
+
+
 
 const nGraphs = 3
 
@@ -47,8 +51,16 @@ const masterGains = [...Array(nGraphs)].map(_ => {
     return gain
 })
     
+
+
+
+
+
+
+
 MY_JS_DIALS.forEach(dial => {
-    if (dial.id.startsWith('aux')) {
+    if (dial.id.startsWith('aux')) 
+    {
 
         dial.value = aux_ADSR[dial.id.split`-`[2]]
         dial.render()
@@ -57,7 +69,9 @@ MY_JS_DIALS.forEach(dial => {
             aux_ADSR.render()
         })
 
-    } else if (dial.id.includes('adsr')) {
+    } 
+    else if (dial.id.includes('adsr')) 
+    {
         
         dial.value = ADSR[dial.id.split`-`[1]]
         dial.render()
@@ -67,6 +81,13 @@ MY_JS_DIALS.forEach(dial => {
         })
 
     }
+    // else if (dial.id === 'BPM') {
+        
+    //     D('BPM-text').innerHTML = BPM,
+    //     dial.attach(x => {
+    //         BPM = D('BPM-text').innerHTML = (500 ** .5) ** (x+1) | 0  
+    //     })
+    // }
 })
 
 // spec says 24000, but I can only hear up to 17k.

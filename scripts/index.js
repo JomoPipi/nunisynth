@@ -5,6 +5,7 @@
 const G = new NuniGraph(masterGain, D('nuni-graph'), { animate: true })
 
 const KB = new Keyboard(D('keyboard'))
+KB.toggleSidePanel()
 
 const graphs = []
 
@@ -18,11 +19,11 @@ const FORCE_LANDSCAPE = startScreenSetup({
         G.update()
     },
     text: `
-    <p style='position:absolute;top:0;font-size:0.5em'>
+    <p style='position:absolute;top:0;font-size:1em'>
         use your mobile device in landscape mode
     </p>
     
-    <span style='position:absolute;bottom:5%;font-size:1em'>
+    <span style='position:absolute;bottom:5%;font-size:2em'>
         Nuni 
         <p>
             version 0.1
@@ -31,8 +32,10 @@ const FORCE_LANDSCAPE = startScreenSetup({
 `
 })
 function noteOn(x,y) {
+
     const [pitchFactor, vertFactor, keynum] = KB.getFrequencyFactorsAndKeyNumber(x,y)
     const newlyHeld = KB.keyConnectsTo[keynum] == null
+
     if (newlyHeld) {
         const g = graphs.shift()
         KB.keyConnectsTo[keynum] = g.adsr
@@ -99,8 +102,11 @@ function noteOn(x,y) {
     return keynum
 }
 
-function noteOff(adsr) {
-    
+
+function noteOff(i) {
+
+    const adsr = KB.keyConnectsTo[i]
+    KB.keyConnectsTo[i] = null
     const { release } = ADSR
     const t = audioCtx.currentTime
     adsr.gain.cancelScheduledValues(t)
@@ -126,9 +132,10 @@ KB.canvas.addEventListener('touchmove',  touch)
 KB.canvas.addEventListener('touchend',   touch)
 
 function touch(e) {
-    if (!e.touches.length) KB.canvas.style.backgroundColor = '#333'
+    const arr = [...e.touches].reverse().slice(0,nGraphs)
+    
     return KB.processCoordinateArray(
-        [...e.touches].reverse().slice(0,nGraphs),
+        arr,
         noteOn,
         noteOff
     )

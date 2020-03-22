@@ -1,14 +1,16 @@
+const C_NOTE = 130.81278265029934
+
 const preset = G => {
 
     G.selectedNode = G.root
     G.deleteSelectedNode()
     
     return {
-        0: _ => {
+        0: _ => { // belly_bells
             ;[...Array(2)].reduce((a,_,n) =>
                 a.addChild(nodetypes.FILTER, 'channel',
                 {
-                    values: { frequency: 300 + 3 ** (4 + (n*3)/TAU), frequency_yAxisFactor: -8 },
+                    values: { frequency: C_NOTE + 3 ** (4 + (n*3)/TAU), frequency_yAxisFactor: -2 },
                     doConnect: true
 
                 }), G.root)
@@ -23,7 +25,10 @@ const preset = G => {
                 c.children[0]
                     .addChild(nodetypes.OSC, 'channel',
                     {
-                        values: { frequency: 3 ** n, frequency_yAxisFactor: PHI },
+                        values: { 
+                            frequency: 3 ** n, 
+                            frequency_yAxisFactor: PHI,
+                        },
                         doConnect: true,
 
                     })
@@ -32,19 +37,26 @@ const preset = G => {
                 
                 c.addChild(nodetypes.OSC, 'channel',
                 {
-                    values: { frequency: 2 ** (8 + n * 3 /PHI) },
+                    values: { 
+                        frequency: 2 ** (Math.log2(C_NOTE*2) + n * 3 /PHI),
+                        frequency_auxAdsrVal: -0.5,
+                    },
                     doConnect: true
                 })
             })
             G.root.gain.yAxisFactor = 0.9
             G.update()
+            ADSR.render()
+            aux_ADSR.render()
             // debug,('g=',G.nodes.length)
         },
         1: _ => {
-            ;[...Array(5)].reduce((a,_,n) =>
+            ;[...Array(4)].reduce((a,_,n) =>
                 a.addChild(nodetypes.OSC, 'channel',
                 {
-                    values: { frequency: 2 ** (6 + n/PHI) },
+                    values: { frequency: 2 ** (Math.log2(C_NOTE*2) + n/PHI),
+                        frequency_auxAdsrVal: 0.3,
+                    },
                     doConnect: true
     
                 }), G.root)
@@ -53,7 +65,10 @@ const preset = G => {
                 
                 c.addChild(nodetypes.GAIN, 'frequency',
                 {
-                    values: { gain: n * PHI, gain_yAxisFactor: 7.5 },
+                    values: { 
+                        gain: n * .5, 
+                        gain_yAxisFactor: 7.5
+                    },
                 })
                 c.children[0].addChild(nodetypes.OSC, 'channel',
                 {
@@ -61,8 +76,13 @@ const preset = G => {
                     doConnect: true,
                 })
             })
+            G.root.setValueOf('gain', 0.12345)
             G.root.gain.yAxisFactor = 0.25
+            aux_ADSR.attack = 0.0
+            aux_ADSR.decay = 0.0
             G.update()
+            ADSR.render()
+            aux_ADSR.render()
             // debug('g=',G.nodes.length)
         },
 
@@ -97,6 +117,8 @@ const preset = G => {
             })
             G.root.gain.yAxisFactor = PHI
             G.update()
+            ADSR.render()
+            aux_ADSR.render()
             // debug('g=',G.nodes.length)
         },
         
@@ -151,78 +173,100 @@ const preset = G => {
         },
         4: _ => {
             G.root.addChild(nodetypes.OSC,'channel',{
-                values: { frequency: 40, frequency_auxAdsrVal: 3, audioNodeType: 'triangle' },
+                values: { frequency: C_NOTE / 4.0, frequency_auxAdsrVal: 3, audioNodeType: 'triangle' },
                 doConnect: true
             })
             .children[0].addChild(nodetypes.GAIN,'frequency',{
                 values: { gain: 50, gain_yAxisFactor: 4, gain_auxAdsrVal: 3 }
             })
             .children[0].addChild(nodetypes.OSC,'channel',{
-                values: { frequency: 20, frequency_auxAdsrVal: 2, audioNodeType: 'sawtooth' },
+                values: { frequency: C_NOTE / 7.98, frequency_auxAdsrVal: 2, audioNodeType: 'sawtooth' },
                 doConnect: true
             })
 
             aux_ADSR.attack = 0.013129376702863738
             aux_ADSR.decay = 0.24486140259274407
-            ADSR.attack = 0.010416984558105469
+            ADSR.attack = 0.020416984558105469
             ADSR.decay = 0.00008349227905273
             ADSR.sustain = 0.9233901420913412
-            ADSR.release = 0.1601858678519443
+            ADSR.release = 0.0601858678519443
 
+            G.update()
             ADSR.render()
             aux_ADSR.render()
-            G.update()
+            MY_JS_DIALS.forEach(d => d.render())
         },
-        5: _ => {
+        5: _ => { // techno
+            let x = 0.01
             ;[...Array(3)].forEach((_,i) => {
 
+                
                 G.root
 
-                .addChild(nodetypes.OSC,'channel',{
-                    values: { frequency: 280 - i, frequency_auxAdsrVal: -3 },
+                .addChild(nodetypes.GAIN,'channel',{
+                    values: { gain: x*10, gain_yAxisFactor: 0 },
                     doConnect: true
                 })
-                .addChild(nodetypes.OSC,'channel',{
-                    values: { frequency: 140 + i * 2, frequency_auxAdsrVal: -2 },
+                .addChild(nodetypes.GAIN,'channel',{
+                    values: { gain: x+.1, gain_yAxisFactor: 0.9 },
                     doConnect: true
                 })
-                .addChild(nodetypes.OSC,'channel',{
-                    values: { frequency: 70 + i * 2, frequency_auxAdsrVal: 1 },
+                .addChild(nodetypes.GAIN,'channel',{
+                    values: { gain: x+.2, gain_yAxisFactor: 0.9 },
                     doConnect: true
                 })
-                // .children[0].addChild(nodetypes.GAIN, 'frequency', { 
-                //     gain: 100, gain_yAxisFactor: 2 
-                // })
-                // .children[0].addChild(nodetypes.OSC,'channel',{
-                //     values: { frequency: 70 + i, frequency_yAxisFactor: .75 },
-                //     doConnect: true
-                // })
-                // .addChild(nodetypes.OSC,'gain',{
-                //     values: { frequency: 8 + i, frequency_yAxisFactor: .75 },
-                //     doConnect: true
-                // })
+                x += .01
+                
             })
 
-            aux_ADSR.attack = 0.013129376702863738
-            aux_ADSR.decay = 0.09486140259274407
+            G.root.children.forEach((c,i) => {
+                
+                c
+                // .addChild(nodetypes.OSC,'channel',{
+                //     values: { frequency: C_NOTE * 2 - i, frequency_auxAdsrVal: -3 },
+                //     audioNodeType: 'sawtooth',
+                //     doConnect: true
+                // })
+                .addChild(nodetypes.OSC,'channel',{
+                    values: { 
+                        frequency: C_NOTE * (2 ** (1/100.0)) ** i,
+                        frequency_auxAdsrVal: i % 2 ? -i/9.0 : i/9.0,
+                    },
+                    audioNodeType: 'sawtooth',
+                    doConnect: true
+                })
+                // .addChild(nodetypes.OSC,'channel',{
+                //     values: { frequency: C_NOTE / 2.0 + i * 2, frequency_auxAdsrVal: 1 },
+                //     audioNodeType: 'sawtooth',
+                //     doConnect: true
+                // })
+
+            })
+
+
+            G.root.setValueOf('gain', 0.1)
+
+            aux_ADSR.attack = 0.0
+            aux_ADSR.decay = 0.0
             ADSR.attack = 0.010416984558105469
             ADSR.decay = 0.00008349227905273
             ADSR.sustain = 0.9233901420913412
             ADSR.release = 0.1601858678519443
 
+            G.update()
             ADSR.render()
             aux_ADSR.render()
-            G.update()
+            MY_JS_DIALS.forEach(d => d.render())
         },
-        6: _ => {
+        6: _ => { // big_trumpet
             G.root
             .addChild(nodetypes.FILTER,'channel',{
-                values: { frequency: 173, frequency_yAxisFactor: 0.5 },
+                values: { frequency: C_NOTE * 2, frequency_yAxisFactor: 0.5 },
                 doConnect: true
             })
             .children[0]
             .addChild(nodetypes.OSC,'channel', {
-                values: {frequency: 224 },
+                values: {frequency: C_NOTE * 2 },
                 doConnect: true
             })
             .children[0]
@@ -242,10 +286,12 @@ const preset = G => {
             ADSR.sustain = 0.9233901420913412
             ADSR.release = 0.2001858678519443
             
+            G.root.setValueOf('gain', 0.2)
             G.root.gain.yAxisFactor = 0 
+            G.update()
             ADSR.render()
             aux_ADSR.render()
-            G.update()
+            MY_JS_DIALS.forEach(d => d.render())
         },
     }
 }
